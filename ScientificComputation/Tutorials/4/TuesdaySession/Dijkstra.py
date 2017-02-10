@@ -183,3 +183,5 @@ if __name__ == '__main__':
     shpath = Dijkst(12, 51, wei)
     t1 = time.time()
     print 'Dijkstra:     ', ist + 1, ' -> ', isp + 1, ' is ', np.array(shpath) + 1, t1 - t0
+
+
