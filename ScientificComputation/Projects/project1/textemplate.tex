@@ -1,0 +1,134 @@
+\documentclass[paper=a4, fontsize=12pt]{scrartcl} % A4 paper and 11pt font size
+
+\usepackage[T1]{fontenc} % use 8-bit encoding that has 256 glyphs
+\usepackage{fourier}     % use the Adobe Utopia font for the document
+                         % (comment this line to return to the LaTeX default)
+\usepackage[english]{babel} % English language/hyphenation
+\usepackage{amsmath,amsfonts,amsthm} % math packages
+\usepackage{subeqnarray}
+
+\usepackage{lipsum} % used for inserting dummy 'Lorem ipsum' text into the template
+\usepackage{bold-extra}
+
+\usepackage{listings}
+\usepackage[utf8]{inputenc}
+
+% default fixed font does not support bold face
+\DeclareFixedFont{\ttb}{T1}{txtt}{bx}{n}{12} % for bold
+\DeclareFixedFont{\ttm}{T1}{txtt}{m}{n}{12}  % for normal
+
+% custom colors
+\usepackage{color}
+\definecolor{deepblue}{rgb}{0,0,0.5}
+\definecolor{deepred}{rgb}{0.6,0,0}
+\definecolor{deepgreen}{rgb}{0,0.5,0}
+\definecolor{lightblue}{rgb}{0.95,0.95,1}
+\definecolor{lightgrey}{rgb}{0.6,0.6,0.6}
+\usepackage{listings}
+
+% use graphics packages
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{tikz}
+\usetikzlibrary{matrix}
+\usetikzlibrary{calc}
+\usetikzlibrary{patterns,fadings}
+
+% python style for highlighting
+\newcommand\pythonstyle{\lstset{
+language=Python,
+backgroundcolor=\color{lightblue},
+basicstyle=\ttm,
+otherkeywords={self,def},             % add keywords here
+keywordstyle=\ttb\color{deepblue},
+emph={while,for,if,elif,else,def,as,shape,conj,dot,copy,flatten,eye,zeros,ones,hstack,vstack,real,imag,conjugate,sin,cos,exp,append,insert,index,__main__}, % custom highlighting
+%emphstyle=\ttb\color{deepred},     % custom highlighting style
+emphstyle=\ttb\color{deepblue},     % custom highlighting style
+stringstyle=\color{deepgreen},
+commentstyle=\color{lightgrey},
+frame=tb,                         % any extra options here
+numbers=left,
+showstringspaces=false            %
+}}
+
+% python environment
+\lstnewenvironment{python}[1][]
+{
+\pythonstyle
+\lstset{#1}
+}
+{}
+
+% python for external files
+\newcommand\pythonexternal[2][]{{
+\pythonstyle
+\lstinputlisting[#1]{#2}}}
+
+% python for inline
+\newcommand\pythoninline[1]{{\pythonstyle\lstinline!#1!}}
+
+
+\usepackage{sectsty}        % allows customizing section commands
+\allsectionsfont{\centering \normalfont\scshape}      % make all sections centered
+                                                      % the default font and small caps
+
+\usepackage{fancyhdr}        % custom headers and footers
+\pagestyle{fancyplain}       % makes all pages in the document conform to
+                             % the custom headers and footers
+\fancyhead{}                 % no page header - if you want one, create it in
+                             % the same way as the footers below
+\fancyfoot[L]{}              % empty left footer
+\fancyfoot[C]{}              % empty center footer
+\fancyfoot[R]{\thepage}      % page numbering for right footer
+\renewcommand{\headrulewidth}{0pt}     % remove header underlines
+\renewcommand{\footrulewidth}{0pt}     % remove footer underlines
+\setlength{\headheight}{13.6pt}        % customize the height of the header
+
+\numberwithin{equation}{section}       % number equations within sections
+                                       % (i.e. 1.1, 1.2, 2.1, 2.2 instead of 1, 2, 3, 4)
+\numberwithin{figure}{section}         % number figures within sections
+                                       % (i.e. 1.1, 1.2, 2.1, 2.2 instead of 1, 2, 3, 4)
+\numberwithin{table}{section}          % number tables within sections
+                                       % (i.e. 1.1, 1.2, 2.1, 2.2 instead of 1, 2, 3, 4)
+
+\setlength\parindent{0pt}         % removes all indentation from paragraphs
+                                  % comment this line for an assignment with lots of text
+
+%--------------------------
+%	TITLE SECTION
+%--------------------------
+
+\newcommand{\horrule}[1]{\rule{\linewidth}{#1}} % create horizontal rule command
+                                                % with 1 argument of height
+
+\title{
+\normalfont \normalsize
+\textsc{Imperial College London, Department of Mathematics} \\ [25pt]
+\horrule{0.5pt} \\[0.4cm]                      % thin top horizontal rule
+\huge Scientific Computing (M3SC) \\           % the assignment title
+\horrule{2pt} \\[0.5cm]                        % thick bottom horizontal rule
+}
+
+\author{Peter J. Schmid}
+\date{\normalsize\today}
+
+\begin{document}
+%\ttfamily
+%\fontseries{b}\selectfont
+
+\maketitle
+
+\section{First Headline}
+
+\begin{python}
+  import numpy as np
+  import scipy as sp
+  # Matlab: a=eye(3), a=zeros(3,4), a=ones(3,4)
+  a=np.eye(3), a=np.zeros((3,4)), a=np.ones((3,4))
+  # Matlab: [a b], [a; b]
+  hstack((a,b)), vstack((a,b))
+  # Matlab: max(max(a)), max(a), max(a,[],2)
+  a.max(), a.max(0), a.max(1)
+\end{python}
+
+\end{document}
