@@ -30,5 +30,10 @@ if __name__ == '__main__':
     file.close()
 
     wei = misc.calcWei(RomeX, RomeY, RomeA, RomeB, RomeV)
+    tempwei = wei.copy()
 
-    print(wei)
+    # need a vector c which stores the number of cars at each vertex in the graph
+
+
+
+    
