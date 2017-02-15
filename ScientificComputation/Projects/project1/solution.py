@@ -44,7 +44,7 @@ if __name__ == '__main__':
 
 
     # initialise minutes and number of nodes
-    minutes = 1
+    minutes = 200
     noNodes = wei.shape[0]
 
     # need a vector c which stores the number of cars at each vertex in the graph
@@ -55,30 +55,19 @@ if __name__ == '__main__':
 
     for i in range(minutes):
 
-        if (minutes <= 179):
+        if (i <= 179):
             carNumbers[12] += 20
-        # inject 20 cars into node 13
-
-        # cars choose the fastest route to node 52.
 
 
-        # Need to change so that fastest route is calculated only if carNumbers[node]!= 0
         fastestRoute = [nextNode(dijk.Dijkst(int(node), 51, tempwei)) for node in range(noNodes)]
-
-
-        # cars move to next node BUT
-        # only 70% of each move to next node, 30% stay where they are
-
 
         carNumbersUpdate = carNumbers.copy()
 
-
-        #carNumbersUpdate is carNumbersOld
         for jnode, numberOfCars in enumerate(carNumbers):
 
             amountMoving = int(0.7 * numberOfCars)
-            newnoofcars = carNumbers[jnode]
-            amountStaying = numberOfCars - amountMoving
+
+            amountStaying = carNumbersUpdate[jnode] - amountMoving
             # so we don't add any new cars to the system
 
             # we have just moved the old cars to new node.
@@ -87,17 +76,19 @@ if __name__ == '__main__':
             carNumbersUpdate[jnode] = amountStaying
             carNumbersUpdate[nodeToMoveTo] = carNumbersUpdate[nodeToMoveTo] + amountMoving
             # now we need to remove these cars from where they originally where
-            if jnode == 13:
-                print(carNumbersUpdate)
+            #if jnode == 12:
+                #print(carNumbersUpdate)
 
 
-        # all the cars have now moved to their new positions.
-        # at node 52, 40% of cars leave the network but 60% are left behind
+            # all the cars have now moved to their new positions.
+            # at node 52, 40% of cars leave the network but 60% are left behind
 
-        leaving51 = int(carNumbersUpdate[51] * 0.4)
-        staying51 = carNumbersUpdate[51] - leaving51
+            leaving51 = int(carNumbersUpdate[51] * 0.4)
+            staying51 = carNumbersUpdate[51] - leaving51
 
-        carNumbersUpdate[51] = staying51
+            carNumbersUpdate[51] = staying51
+
+            carNumbers = carNumbersUpdate.copy()
 
         # update tempwei
 
@@ -107,6 +98,7 @@ if __name__ == '__main__':
                 if tempwei[l, m] != float(0):
                     tempwei[l, m] = wei[l, m] + epsilon * (float(carNumbersUpdate[l]) + float(carNumbersUpdate[m]))/ float(2)
 
-        carNumbers = carNumbersUpdate.copy()
 
 
+
+        print(sum(carNumbers))
