@@ -41,7 +41,7 @@ if __name__ == '__main__':
     tempwei = wei.copy()
 
     # initialise minutes and number of nodes
-    minutes = 201
+    minutes = 181
     noNodes = wei.shape[0]
 
     # need a vector c which stores the number of cars at each vertex in the graph
@@ -49,15 +49,15 @@ if __name__ == '__main__':
     # we initialise so there are 20 cars at node 13
     maxNumberCars = np.zeros(noNodes, dtype=int)
 
-    plotofsum = np.zeros(201,dtype=int)
+    plotofsum = np.zeros(181,dtype=int)
 
-    carNumbers[12] = 20
+
 
     for i in range(minutes):
 
         if (i <= 179):
             carNumbers[12] += 20
-
+        # print(sum(carNumbers))
         fastestRoute = [nextNode(dijk.Dijkst(int(node), 51, tempwei)) for node in range(noNodes)]
 
         carNumbersUpdated = carNumbers.copy()
@@ -100,11 +100,15 @@ if __name__ == '__main__':
                         float(carNumbersUpdated[l]) + float(carNumbersUpdated[m])) / float(2)
 
         plotofsum[i] = sum(carNumbers)
+        if i == 180:
+            print(carNumbers)
+            print(sum(carNumbers))
 
 
 
-    plt.figure()
 
-    plt.plot(range(201),plotofsum)
-
-    plt.show()
+    # plt.figure()
+    #
+    # plt.plot(range(180),plotofsum)
+    #
+    # plt.show()
