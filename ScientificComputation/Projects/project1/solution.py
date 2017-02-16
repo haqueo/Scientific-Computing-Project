@@ -10,7 +10,6 @@ def nextNode(path):
         return path[0]
     else:
 
-
         return path[1]
 
 
@@ -41,10 +40,8 @@ if __name__ == '__main__':
     wei = misc.calcWei(RomeX, RomeY, RomeA, RomeB, RomeV)
     tempwei = wei.copy()
 
-
-
     # initialise minutes and number of nodes
-    minutes = 200
+    minutes = 179
     noNodes = wei.shape[0]
 
     # need a vector c which stores the number of cars at each vertex in the graph
@@ -58,13 +55,11 @@ if __name__ == '__main__':
         if (i <= 179):
             carNumbers[12] += 20
 
-
         fastestRoute = [nextNode(dijk.Dijkst(int(node), 51, tempwei)) for node in range(noNodes)]
 
         carNumbersUpdate = carNumbers.copy()
 
         for jnode, numberOfCars in enumerate(carNumbers):
-
             amountMoving = int(0.7 * numberOfCars)
 
             amountStaying = carNumbersUpdate[jnode] - amountMoving
@@ -75,20 +70,16 @@ if __name__ == '__main__':
 
             carNumbersUpdate[jnode] = amountStaying
             carNumbersUpdate[nodeToMoveTo] = carNumbersUpdate[nodeToMoveTo] + amountMoving
-            # now we need to remove these cars from where they originally where
-            #if jnode == 12:
-                #print(carNumbersUpdate)
 
+        # all the cars have now moved to their new positions.
+        # at node 52, 40% of cars leave the network but 60% are left behind
 
-            # all the cars have now moved to their new positions.
-            # at node 52, 40% of cars leave the network but 60% are left behind
+        leaving51 = int(carNumbersUpdate[51] * 0.4)
+        staying51 = carNumbersUpdate[51] - leaving51
 
-            leaving51 = int(carNumbersUpdate[51] * 0.4)
-            staying51 = carNumbersUpdate[51] - leaving51
+        carNumbersUpdate[51] = staying51
 
-            carNumbersUpdate[51] = staying51
-
-            carNumbers = carNumbersUpdate.copy()
+        carNumbers = carNumbersUpdate.copy()
 
         # update tempwei
 
@@ -96,9 +87,7 @@ if __name__ == '__main__':
         for l in range(noNodes):
             for m in range(noNodes):
                 if tempwei[l, m] != float(0):
-                    tempwei[l, m] = wei[l, m] + epsilon * (float(carNumbersUpdate[l]) + float(carNumbersUpdate[m]))/ float(2)
-
-
-
+                    tempwei[l, m] = wei[l, m] + epsilon * (
+                        float(carNumbersUpdate[l]) + float(carNumbersUpdate[m])) / float(2)
 
         print(sum(carNumbers))
