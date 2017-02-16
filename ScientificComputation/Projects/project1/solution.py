@@ -3,7 +3,7 @@ import Dijkstra as dijk
 import misc
 import numpy as np
 import csv
-
+import matplotlib.pyplot as plt
 
 def nextNode(path):
     if len(path) == 1:
@@ -41,14 +41,17 @@ if __name__ == '__main__':
     tempwei = wei.copy()
 
     # initialise minutes and number of nodes
-    minutes = 179
+    minutes = 201
     noNodes = wei.shape[0]
 
     # need a vector c which stores the number of cars at each vertex in the graph
     carNumbers = np.zeros(noNodes, dtype=int)
     # we initialise so there are 20 cars at node 13
+    maxNumberCars = np.zeros(noNodes, dtype=int)
 
+    plotofsum = np.zeros(201,dtype=int)
 
+    carNumbers[12] = 20
 
     for i in range(minutes):
 
@@ -57,29 +60,35 @@ if __name__ == '__main__':
 
         fastestRoute = [nextNode(dijk.Dijkst(int(node), 51, tempwei)) for node in range(noNodes)]
 
-        carNumbersUpdate = carNumbers.copy()
+        carNumbersUpdated = carNumbers.copy()
 
         for jnode, numberOfCars in enumerate(carNumbers):
+
             amountMoving = int(0.7 * numberOfCars)
 
-            amountStaying = carNumbersUpdate[jnode] - amountMoving
-            # so we don't add any new cars to the system
+            # amountStaying is not just 30%, but "the rest" to ensure that
+            # amountStaying + amountMoving = carNumbersUpdated[jnode]
+            amountStaying = carNumbersUpdated[jnode] - amountMoving
 
-            # we have just moved the old cars to new node.
             nodeToMoveTo = fastestRoute[jnode]
 
-            carNumbersUpdate[jnode] = amountStaying
-            carNumbersUpdate[nodeToMoveTo] = carNumbersUpdate[nodeToMoveTo] + amountMoving
+            carNumbersUpdated[jnode] = amountStaying
+            carNumbersUpdated[nodeToMoveTo] += amountMoving
+
+        #FIND MAXIMUM NUMBER OF CARS AT EACH NODE
+
 
         # all the cars have now moved to their new positions.
         # at node 52, 40% of cars leave the network but 60% are left behind
 
-        leaving51 = int(carNumbersUpdate[51] * 0.4)
-        staying51 = carNumbersUpdate[51] - leaving51
+        leaving51 = int(carNumbersUpdated[51] * 0.4)
+        staying51 = carNumbersUpdated[51] - leaving51
 
-        carNumbersUpdate[51] = staying51
+        carNumbersUpdated[51] = staying51
 
-        carNumbers = carNumbersUpdate.copy()
+
+        #carNumbersOld becomes updated
+        carNumbers = carNumbersUpdated.copy()
 
         # update tempwei
 
@@ -88,6 +97,14 @@ if __name__ == '__main__':
             for m in range(noNodes):
                 if tempwei[l, m] != float(0):
                     tempwei[l, m] = wei[l, m] + epsilon * (
-                        float(carNumbersUpdate[l]) + float(carNumbersUpdate[m])) / float(2)
+                        float(carNumbersUpdated[l]) + float(carNumbersUpdated[m])) / float(2)
 
-        print(sum(carNumbers))
+        plotofsum[i] = sum(carNumbers)
+
+
+
+    plt.figure()
+
+    plt.plot(range(201),plotofsum)
+
+    plt.show()
