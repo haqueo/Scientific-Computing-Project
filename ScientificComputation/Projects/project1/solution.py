@@ -5,12 +5,22 @@ import numpy as np
 import csv
 import matplotlib.pyplot as plt
 
+
 def nextNode(path):
     if len(path) == 1:
         return path[0]
     else:
 
         return path[1]
+
+
+def update_weight_matrix(epsilon, c,weightMatrix,originalWeightMatrix):
+    for l in range(noNodes):
+        for m in range(noNodes):
+            if weightMatrix[l, m] != float(0):
+                weightMatrix[l, m] = originalWeightMatrix[l, m] + epsilon * (
+                    float(c[l]) + float(c[m])) / float(2)
+    return weightMatrix
 
 
 if __name__ == '__main__':
@@ -49,14 +59,9 @@ if __name__ == '__main__':
     # we initialise so there are 20 cars at node 13
     maxNumberCars = np.zeros(noNodes, dtype=int)
 
-    plotofsum = np.zeros(181,dtype=int)
-
-
-
     for i in range(minutes):
 
-        if (i <= 179):
-            carNumbers[12] += 20
+
         # print(sum(carNumbers))
         fastestRoute = [nextNode(dijk.Dijkst(int(node), 51, tempwei)) for node in range(noNodes)]
 
@@ -64,51 +69,64 @@ if __name__ == '__main__':
 
         for jnode, numberOfCars in enumerate(carNumbers):
 
-            amountMoving = int(0.7 * numberOfCars)
+            nodeToMoveTo = fastestRoute[jnode]
+
+            # USING NP. ROUND
+
+            # alternatively: amountMoving = int(0.7 * numberOfCars)
+            amountMoving = np.round(0.7 * numberOfCars)
 
             # amountStaying is not just 30%, but "the rest" to ensure that
             # amountStaying + amountMoving = carNumbersUpdated[jnode]
             amountStaying = carNumbersUpdated[jnode] - amountMoving
 
-            nodeToMoveTo = fastestRoute[jnode]
+
 
             carNumbersUpdated[jnode] = amountStaying
             carNumbersUpdated[nodeToMoveTo] += amountMoving
 
-        #FIND MAXIMUM NUMBER OF CARS AT EACH NODE
+        # FIND MAXIMUM NUMBER OF CARS AT EACH NODE
 
 
         # all the cars have now moved to their new positions.
         # at node 52, 40% of cars leave the network but 60% are left behind
 
-        leaving51 = int(carNumbersUpdated[51] * 0.4)
-        staying51 = carNumbersUpdated[51] - leaving51
+        ## USING np.round, alternatively: leaving51 = int(carNumbersUpdated[51] * 0.4)
 
-        carNumbersUpdated[51] = staying51
+        leaving51 = np.round(carNumbersUpdated[51] * 0.4)
+        carNumbersUpdated[51] = carNumbersUpdated[51] - leaving51
 
 
-        #carNumbersOld becomes updated
-        carNumbers = carNumbersUpdated.copy()
 
         # update tempwei
 
-        epsilon = 0.01
-        for l in range(noNodes):
-            for m in range(noNodes):
-                if tempwei[l, m] != float(0):
-                    tempwei[l, m] = wei[l, m] + epsilon * (
-                        float(carNumbersUpdated[l]) + float(carNumbersUpdated[m])) / float(2)
+        tempwei = update_weight_matrix(0.01, carNumbersUpdated,tempwei,wei)
 
-        plotofsum[i] = sum(carNumbers)
-        if i == 180:
-            print(carNumbers)
-            print(sum(carNumbers))
+        # carNumbersOld becomes updated
+        carNumbers = carNumbersUpdated.copy()
+
+        if (i <= 179):
+            carNumbers[12] += 20
 
 
 
+        print(sum(carNumbers))
 
-    # plt.figure()
-    #
-    # plt.plot(range(180),plotofsum)
-    #
-    # plt.show()
+
+
+
+
+
+    # c = [0,0,...,0]
+
+    for i in range(200):
+
+        # use c, and move all the cars according to the rules and weight matrix
+
+        # remove cars from node 51
+
+        # update the weight matrix
+
+        # inject 20 cars if i <= 179
+
+      pass
