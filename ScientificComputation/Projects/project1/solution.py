@@ -103,7 +103,7 @@ if __name__ == '__main__':
         # Now we need to update the weight matrix according to step 5.
         # This is at the bottom of the for loop, since step 5 clearly states to do this after
         # "all cars have moved to their new position". I interpret this as meaning after the
-        # Initial injection.
+        # injection at node 13.
         temp_wei = update_weight_matrix(0.01, carNumbers, temp_wei, wei)
 
         print(sum(carNumbers))
