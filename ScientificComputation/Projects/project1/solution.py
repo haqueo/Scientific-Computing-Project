@@ -10,7 +10,6 @@ def nextNode(path):
     if len(path) == 1:
         return path[0]
     else:
-
         return path[1]
 
 
@@ -61,7 +60,6 @@ if __name__ == '__main__':
 
     for i in range(minutes):
 
-
         # print(sum(carNumbers))
         fastestRoute = [nextNode(dijk.Dijkst(int(node), 51, tempwei)) for node in range(noNodes)]
 
@@ -93,8 +91,10 @@ if __name__ == '__main__':
 
         ## USING np.round, alternatively: leaving51 = int(carNumbersUpdated[51] * 0.4)
 
-        leaving51 = np.round(carNumbersUpdated[51] * 0.4)
-        carNumbersUpdated[51] = carNumbersUpdated[51] - leaving51
+        # leaving51 = np.round(carNumbersUpdated[51] * 0.4)
+        # carNumbersUpdated[51] = carNumbersUpdated[51] - leaving51
+
+        carNumbersUpdated[51] = np.round(carNumbersUpdated[51]*0.6)
 
 
 
@@ -102,6 +102,7 @@ if __name__ == '__main__':
 
         tempwei = update_weight_matrix(0.01, carNumbersUpdated,tempwei,wei)
 
+        print(sum(carNumbers))
         # carNumbersOld becomes updated
         carNumbers = carNumbersUpdated.copy()
 
@@ -109,8 +110,6 @@ if __name__ == '__main__':
             carNumbers[12] += 20
 
 
-
-        print(sum(carNumbers))
 
 
 
