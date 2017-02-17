@@ -41,7 +41,7 @@ if __name__ == '__main__':
     tempwei = wei.copy()
 
     # initialise minutes and number of nodes
-    minutes = 181
+    minutes = 200
     noNodes = wei.shape[0]
 
     # need a vector c which stores the number of cars at each vertex in the graph
