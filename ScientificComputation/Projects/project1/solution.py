@@ -61,6 +61,7 @@ if __name__ == '__main__':
 
     # Need a vector carNumbers which stores the number of cars at each vertex in the graph
     carNumbers = np.zeros(noNodes, dtype=int)
+    maxCarNumbers = carNumbers.copy()
 
     # Iterate through the 200 minutes
     for i in range(minutes):
@@ -100,20 +101,27 @@ if __name__ == '__main__':
         # Now we need to remove cars from the system from node 52 (step 4). Again, we use np.round
         carNumbersUpdated[51] = np.round(carNumbersUpdated[51]*0.6)
 
+
         # Now we have finished iterating through carNumbers, we can update it with the new values.
         carNumbers = carNumbersUpdated.copy()
+
+
 
         # The initial conditions state to inject 20 cars at node 13 only for the first 180 iterations.
         if i <= 179:
             carNumbers[12] += 20
 
+        maxCarNumbers = [max(carNumbers[node], maxCarNumbers[node]) for node in range(noNodes)]
+        print(carNumbers)
+        print(sum(carNumbers))
         # Now we need to update the weight matrix according to step 5.
         # This is at the bottom of the for loop, since step 5 clearly states to do this after
         # "all cars have moved to their new position". I interpret this as meaning after the
         # injection at node 13.
         temp_wei = update_weight_matrix(0.01, carNumbers, temp_wei, wei)
 
-        print(sum(carNumbers))
+
+
 
 
 
