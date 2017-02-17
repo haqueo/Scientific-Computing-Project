@@ -22,10 +22,8 @@ def update_weight_matrix(epsilon, c,weightMatrix,originalWeightMatrix):
     return weightMatrix
 
 
-if __name__ == '__main__':
-
-    # import the rome edges file
-
+def extract_data():
+    global RomeX, RomeY, RomeA, RomeB, RomeV
     RomeX = np.empty(0, dtype=float)
     RomeY = np.empty(0, dtype=float)
     with open('./data/RomeVertices', 'r') as file:
@@ -34,7 +32,6 @@ if __name__ == '__main__':
             RomeX = np.concatenate((RomeX, [float(row[1])]))
             RomeY = np.concatenate((RomeY, [float(row[2])]))
     file.close()
-
     RomeA = np.empty(0, dtype=int)
     RomeB = np.empty(0, dtype=int)
     RomeV = np.empty(0, dtype=float)
@@ -46,25 +43,35 @@ if __name__ == '__main__':
             RomeV = np.concatenate((RomeV, [float(row[2])]))
     file.close()
 
+
+if __name__ == '__main__':
+
+    # Import the rome edges file
+    extract_data()
+
+    # Use the calcWei function from tutorials, along with the data set given
+    # to calculate the weight matrix. Also create a copy which is the temporary
+    # weight matrix.
     wei = misc.calcWei(RomeX, RomeY, RomeA, RomeB, RomeV)
     temp_wei = wei.copy()
 
-    # initialise minutes and number of nodes
+    # Initialise minutes and number of nodes
     minutes = 200
     noNodes = wei.shape[0]
 
-    # need a vector carNumbers which stores the number of cars at each vertex in the graph
+    # Need a vector carNumbers which stores the number of cars at each vertex in the graph
     carNumbers = np.zeros(noNodes, dtype=int)
 
+    # Iterate through the 200 minutes
     for i in range(minutes):
 
-        # this vector fastestRoute chooses the next node in the optimal (fastest route) using
+        # This vector fastestRoute chooses the next node in the optimal (fastest route) using
         # Dijkstra's algorithm. Note this depends on temp_wei, the updated weight matrix.
-        # we need to wrap this in the nextNode function as if we're already at node 52, the next
+        # We need to wrap this in the nextNode function as if we're already at node 52, the next
         # node (at index 1) is not defined.
         fastestRoute = [nextNode(dijk.Dijkst(int(node), 51, temp_wei)) for node in range(noNodes)]
 
-        # we now need to iterate through the vector carNumbers, and move each car according to the next node it needs
+        # We now need to iterate through the vector carNumbers, and move each car according to the next node it needs
         # to go to. But we can't iterate through a vector that we are constantly updating, so we make this copy
         # carNumbersUpdated.
         carNumbersUpdated = carNumbers.copy()
@@ -75,14 +82,14 @@ if __name__ == '__main__':
             # This is where cars at jnode have to move to next (step 1)
             nodeToMoveTo = fastestRoute[jnode]
 
-            # We calculate the amount moving, and staying at jnode. (step 2)
-            # We have a choice of using int(0.7*numberOfCars) and np.round(0.7*numberOfCars)
-            # This isn't specified in the question, but I think it makes more sense to use np.round
+            # We calculate the amount moving, and staying at jnode (step 2).
+            # We have a choice of using int(0.7*numberOfCars) and np.round(0.7*numberOfCars),
+            # this isn't explicitly specified in the question but I think it makes more sense to use np.round
             # since the question specifies "be particularly careful with rounding the number of cars
             # to the *nearest integer*".
             amountMoving = np.round(0.7 * numberOfCars)
 
-            # We set amount staying as the number of cars currently at the node, minus the amount moving
+            # We set amount staying as the number of cars currently at the node, minus the amount moving.
             # This is so that the total number of cars is conserved, and not lost through rounding.
             amountStaying = carNumbersUpdated[jnode] - amountMoving
 
