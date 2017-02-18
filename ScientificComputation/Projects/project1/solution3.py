@@ -6,23 +6,46 @@ import csv
 import matplotlib.pyplot as plt
 
 
-def nextNode(path):
+def next_node(path):
+    """ Returns the next index (after the node itself) in the path.
+        If the path contains only one node, returns the node itself.
+    """
     if len(path) == 1:
         return path[0]
     else:
         return path[1]
 
 
-def update_weight_matrix(epsilon, c, weightMatrix, originalWeightMatrix):
-    new_weight_matrix = np.zeros((58,58))
+def update_weight_matrix(epsilon, c, original_weight_matrix,noNodes=58):
+    """
+    This function updates the weight matrix according to step 5 of the
+    Project. Note the added fix - the weight matrix is not changed if
+    the original entry was 0.
+
+
+
+    :param epsilon: given in question
+    :param c: the vector containing number of cars at each node
+    :param original_weight_matrix: the weight matrix given by RomeEdges
+    :param noNodes: number of nodes in the system
+    :return: the updated weight matrix
+    """
+    new_weight_matrix = np.zeros((noNodes,noNodes))
     for i in range(noNodes):
         for j in range(noNodes):
-            if originalWeightMatrix[i, j] != float(0):
-                new_weight_matrix[i, j] = originalWeightMatrix[i, j] + (epsilon * (float(c[i]) + float(c[j]))) / float(2)
+            if original_weight_matrix[i, j] != float(0):
+                new_weight_matrix[i, j] = original_weight_matrix[i, j] + \
+                                          (epsilon * (float(c[i]) + float(c[j]))) / float(2)
     return new_weight_matrix
 
 
 def extract_data():
+    """
+    This function opens the RomeVertices and RomeEdges files, and creates
+    global variables RomeX, RomeY, RomeA, RomeB and RomeV. These are variables
+    used to create the original weight matrix.
+
+    """
     global RomeX, RomeY, RomeA, RomeB, RomeV
     RomeX = np.empty(0, dtype=float)
     RomeY = np.empty(0, dtype=float)
@@ -50,8 +73,8 @@ if __name__ == '__main__':
     extract_data()
 
     # Use the calcWei function from tutorials, along with the data set given
-    # to calculate the weight matrix. Also create a copy which is the temporary
-    # weight matrix.
+    # to calculate the weight matrix. Also create a copy which is the
+    # temporary weight matrix.
     weightMatrix = misc.calcWei(RomeX, RomeY, RomeA, RomeB, RomeV)
     temp_wei = np.copy(weightMatrix)
 
@@ -60,15 +83,19 @@ if __name__ == '__main__':
     # Initialise minutes and number of nodes
     minutes = 200
     noNodes = weightMatrix.shape[0]
-    # Need a vector carNumbers which stores the number of cars at each vertex in the graph
+
+    # Need a vector carNumbers which stores the number of cars at each vertex
+    # in the graph.
     carNumbers = np.zeros(noNodes, dtype=int)
-    carNumbersUpdated = np.zeros(noNodes, dtype=int)
+    carNumbersUpdated = np.copy(carNumbers)
     maxCarNumbers = np.copy(carNumbers)
 
     # Iterate through the 200 minutes
     for i in range(minutes):
 
-        fastestRoute = [nextNode(dijk.Dijkst(node, 51, temp_wei)) for node in range(noNodes)]
+        # Apply Dijkstra's algorithm to find the fastest path to node 52 in the system.
+        #
+        fastestRoute = [next_node(dijk.Dijkst(node, 51, temp_wei)) for node in range(noNodes)]
 
 
         for jnode in range(noNodes):
@@ -90,10 +117,11 @@ if __name__ == '__main__':
 
 
 
-        temp_wei = update_weight_matrix(0.01, carNumbers, temp_wei, weightMatrix)
+        temp_wei = update_weight_matrix(0.01, carNumbers,weightMatrix)
 
 
         if i <= 179:
             carNumbers[12] += 20
 
 
+    print(maxCarNumbers[30])
