@@ -13,10 +13,10 @@ def nextNode(path):
         return path[1]
 
 
-def update_weight_matrix(epsilon, c,weightMatrix,originalWeightMatrix):
+def update_weight_matrix(epsilon, c, weightMatrix, originalWeightMatrix):
     for l in range(noNodes):
         for m in range(noNodes):
-            if weightMatrix[l, m] != float(0):
+            if originalWeightMatrix[l, m] != float(0):
                 weightMatrix[l, m] = originalWeightMatrix[l, m] + epsilon * (
                     float(c[l]) + float(c[m])) / float(2)
     return weightMatrix
@@ -58,13 +58,15 @@ if __name__ == '__main__':
     # Initialise minutes and number of nodes
     minutes = 200
     noNodes = wei.shape[0]
-
     # Need a vector carNumbers which stores the number of cars at each vertex in the graph
     carNumbers = np.zeros(noNodes, dtype=int)
     maxCarNumbers = carNumbers.copy()
 
+
     # Iterate through the 200 minutes
     for i in range(minutes):
+
+
 
         # This vector fastestRoute chooses the next node in the optimal (fastest route) using
         # Dijkstra's algorithm. Note this depends on temp_wei, the updated weight matrix.
@@ -79,7 +81,6 @@ if __name__ == '__main__':
 
         # we move each car in the network according to rules 1,2 and 3 in the project outline.
         for jnode, numberOfCars in enumerate(carNumbers):
-
             # This is where cars at jnode have to move to next (step 1)
             nodeToMoveTo = fastestRoute[jnode]
 
@@ -88,42 +89,38 @@ if __name__ == '__main__':
             # this isn't explicitly specified in the question but I think it makes more sense to use np.round
             # since the question specifies "be particularly careful with rounding the number of cars
             # to the *nearest integer*".
-            amountMoving = np.round(0.7 * numberOfCars)
-
-            # We set amount staying as the number of cars currently at the node, minus the amount moving.
-            # This is so that the total number of cars is conserved, and not lost through rounding.
+            amountMoving = int(np.round(0.7 * numberOfCars))
+            #
+            #
+            #
+            #
+            # # We set amount staying as the number of cars currently at the node, minus the amount moving.
+            # # This is so that the total number of cars is conserved, and not lost through rounding.
             amountStaying = carNumbersUpdated[jnode] - amountMoving
-
-            # We then update the number of cars as required.
+            #
+            # # We then update the number of cars as required.
             carNumbersUpdated[jnode] = amountStaying
             carNumbersUpdated[nodeToMoveTo] += amountMoving
 
         # Now we need to remove cars from the system from node 52 (step 4). Again, we use np.round
-        carNumbersUpdated[51] = np.round(carNumbersUpdated[51]*0.6)
-
+        carNumbersUpdated[51] = int(np.round(carNumbersUpdated[51] * 0.6))
 
         # Now we have finished iterating through carNumbers, we can update it with the new values.
         carNumbers = carNumbersUpdated.copy()
-
-
 
         # The initial conditions state to inject 20 cars at node 13 only for the first 180 iterations.
         if i <= 179:
             carNumbers[12] += 20
 
         maxCarNumbers = [max(carNumbers[node], maxCarNumbers[node]) for node in range(noNodes)]
+        print("i is %i" % i)
         print(carNumbers)
-        print(sum(carNumbers))
+
         # Now we need to update the weight matrix according to step 5.
         # This is at the bottom of the for loop, since step 5 clearly states to do this after
         # "all cars have moved to their new position". I interpret this as meaning after the
         # injection at node 13.
         temp_wei = update_weight_matrix(0.01, carNumbers, temp_wei, wei)
 
-
-
-
-
-
-
-
+    print(max(maxCarNumbers))
+    print(sum(carNumbers))
