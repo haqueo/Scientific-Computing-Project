@@ -16,7 +16,7 @@ def next_node(path):
         return path[1]
 
 
-def update_weight_matrix(epsilon, c, original_weight_matrix,noNodes=58):
+def update_weight_matrix(epsilon, c, original_weight_matrix, noNodes=58):
     """
     This function updates the weight matrix according to step 5 of the
     Project. Note the added fix - the weight matrix is not changed if
@@ -30,7 +30,7 @@ def update_weight_matrix(epsilon, c, original_weight_matrix,noNodes=58):
     :param noNodes: number of nodes in the system
     :return: the updated weight matrix
     """
-    new_weight_matrix = np.zeros((noNodes,noNodes))
+    new_weight_matrix = np.zeros((noNodes, noNodes))
     for i in range(noNodes):
         for j in range(noNodes):
             if original_weight_matrix[i, j] != float(0):
@@ -101,7 +101,6 @@ if __name__ == '__main__':
         # Move all cars as in steps 2,3. Iterate through every node in the
         # system to do this.
         for j_node in range(noNodes):
-
             # Initialise the number of cars at node j_node.
             number_of_cars = cars_at_node[j_node]
 
@@ -136,4 +135,7 @@ if __name__ == '__main__':
         if i <= 179:
             cars_at_node[12] += 20
 
-    print(sum(cars_at_node))
+    # Find the top 5 most congested nodes.
+    max_index_tracker = [[node, max_cars_at_node[node]] for node in range(noNodes)]
+    top_five = sorted(max_index_tracker, key=lambda key_value: -1*key_value[1])[:5]
+    print(top_five)
