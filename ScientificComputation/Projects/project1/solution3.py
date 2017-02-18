@@ -35,7 +35,8 @@ def update_weight_matrix(epsilon, c, original_weight_matrix,noNodes=58):
         for j in range(noNodes):
             if original_weight_matrix[i, j] != float(0):
                 new_weight_matrix[i, j] = original_weight_matrix[i, j] + \
-                                          (epsilon * (float(c[i]) + float(c[j]))) / float(2)
+                                          (epsilon * (float(c[i]) +
+                                                      float(c[j]))) / float(2)
     return new_weight_matrix
 
 
@@ -75,53 +76,64 @@ if __name__ == '__main__':
     # Use the calcWei function from tutorials, along with the data set given
     # to calculate the weight matrix. Also create a copy which is the
     # temporary weight matrix.
-    weightMatrix = misc.calcWei(RomeX, RomeY, RomeA, RomeB, RomeV)
-    temp_wei = np.copy(weightMatrix)
-
-
+    weight_matrix = misc.calcWei(RomeX, RomeY, RomeA, RomeB, RomeV)
+    temp_wei = weight_matrix.copy()
 
     # Initialise minutes and number of nodes
     minutes = 200
-    noNodes = weightMatrix.shape[0]
+    noNodes = weight_matrix.shape[0]
 
     # Need a vector carNumbers which stores the number of cars at each vertex
     # in the graph.
-    carNumbers = np.zeros(noNodes, dtype=int)
-    carNumbersUpdated = np.copy(carNumbers)
-    maxCarNumbers = np.copy(carNumbers)
+    cars_at_node = np.zeros(noNodes, dtype=int)
+    cars_at_node_updated = cars_at_node.copy()
+    max_cars_at_node = cars_at_node.copy()
 
     # Iterate through the 200 minutes
     for i in range(minutes):
 
-        # Apply Dijkstra's algorithm to find the fastest path to node 52 in the system.
-        #
-        fastestRoute = [next_node(dijk.Dijkst(node, 51, temp_wei)) for node in range(noNodes)]
+        # Apply Dijkstra's algorithm to find the fastest path to node 52 in
+        # the system. Then use next_node to find the next node in the given
+        # path. (step 1)
+        next_nodes = [next_node(dijk.Dijkst(node, 51, temp_wei))
+                      for node in range(noNodes)]
 
+        # Move all cars as in steps 2,3. Iterate through every node in the
+        # system to do this.
+        for j_node in range(noNodes):
 
-        for jnode in range(noNodes):
-            numberOfCars = carNumbers[jnode]
-            nodeToMoveTo = fastestRoute[jnode]
-            amountMoving = int(np.round(0.7 * numberOfCars))
-            amountStaying = numberOfCars - amountMoving
+            # Initialise the number of cars at node j_node.
+            number_of_cars = cars_at_node[j_node]
 
-            carNumbersUpdated[jnode] += amountStaying
-            carNumbersUpdated[nodeToMoveTo] += amountMoving
+            # Initialise the next node to move to.
+            node_to_move_to = next_nodes[j_node]
 
-        carNumbers = np.copy(carNumbersUpdated)
+            # 70% of cars will move. to keep the total conserved, the amount
+            # staying is just number_of_cars - amount_moving
+            amount_moving = int(np.round(0.7 * number_of_cars))
+            amount_staying = number_of_cars - amount_moving
 
-        carNumbersUpdated = np.zeros(noNodes, dtype=int)
+            # We now update cars_at_node.
+            cars_at_node_updated[j_node] += amount_staying
+            cars_at_node_updated[node_to_move_to] += amount_moving
 
-        maxCarNumbers = [max(carNumbers[node], maxCarNumbers[node]) for node in range(noNodes)]
+        # Now all cars have moved where they need to, we set cars_at_node
+        # to this updated vector, and empty the updated vector for the next
+        # iteration.
+        cars_at_node = cars_at_node_updated.copy()
+        cars_at_node_updated = np.zeros(noNodes, dtype=int)
 
-        carNumbers[51] = int(np.round(carNumbers[51] * 0.6))
+        # Now we calculate the maximum number of cars at each node in the system.
+        max_cars_at_node = [max(cars_at_node[node], max_cars_at_node[node]) for node in range(noNodes)]
 
+        # Now we remove 40% of cars from node 52.
+        cars_at_node[51] = int(np.round(cars_at_node[51] * 0.6))
 
+        # The temporary weight matrix is updated.
+        temp_wei = update_weight_matrix(0.01, cars_at_node, weight_matrix)
 
-        temp_wei = update_weight_matrix(0.01, carNumbers,weightMatrix)
-
-
+        # For the first 180 minutes, 20 cars are injected into node 13.
         if i <= 179:
-            carNumbers[12] += 20
+            cars_at_node[12] += 20
 
-
-    print(maxCarNumbers[30])
+    print(sum(cars_at_node))
