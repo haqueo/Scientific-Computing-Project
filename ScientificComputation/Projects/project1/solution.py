@@ -14,11 +14,11 @@ def nextNode(path):
 
 
 def update_weight_matrix(epsilon, c, weightMatrix, originalWeightMatrix):
+
     for l in range(noNodes):
         for m in range(noNodes):
             if originalWeightMatrix[l, m] != float(0):
-                weightMatrix[l, m] = originalWeightMatrix[l, m] + epsilon * (
-                    float(c[l]) + float(c[m])) / float(2)
+                weightMatrix[l, m] = originalWeightMatrix[l, m] + epsilon * (float(c[l]) + float(c[m])) / float(2)
     return weightMatrix
 
 
@@ -44,6 +44,7 @@ def extract_data():
     file.close()
 
 
+
 if __name__ == '__main__':
 
     # Import the rome edges file
@@ -54,6 +55,7 @@ if __name__ == '__main__':
     # weight matrix.
     wei = misc.calcWei(RomeX, RomeY, RomeA, RomeB, RomeV)
     temp_wei = wei.copy()
+
 
     # Initialise minutes and number of nodes
     minutes = 200
