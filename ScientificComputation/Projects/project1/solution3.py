@@ -89,6 +89,8 @@ if __name__ == '__main__':
     cars_at_node_updated = cars_at_node.copy()
     max_cars_at_node = cars_at_node.copy()
 
+    edges_utilised = np.zeros((noNodes, noNodes), dtype=int)
+
     # Iterate through the 200 minutes
     for i in range(minutes):
 
@@ -116,6 +118,9 @@ if __name__ == '__main__':
             cars_at_node_updated[j_node] += amount_staying
             cars_at_node_updated[node_to_move_to] += amount_moving
 
+            # Update edges_utilised matrix
+            edges_utilised[j_node, node_to_move_to] += 1
+
         # Now all cars have moved where they need to, we set cars_at_node
         # to this updated vector, and empty the updated vector for the next
         # iteration.
@@ -136,6 +141,18 @@ if __name__ == '__main__':
             cars_at_node[12] += 20
 
     # Find the top 5 most congested nodes.
-    max_index_tracker = [[node, max_cars_at_node[node]] for node in range(noNodes)]
-    top_five = sorted(max_index_tracker, key=lambda key_value: -1*key_value[1])[:5]
-    print(top_five)
+    max_index_tracker = [[node + 1, max_cars_at_node[node]] for node in range(noNodes)]
+    top_five = sorted(max_index_tracker, key=lambda node_and_max: -1 * node_and_max[1])[:5]
+    # print(top_five)
+
+    print(sorted(max_index_tracker, key=lambda node_and_max: -1 * node_and_max[1]))
+
+    not_utilised = []
+    for i in range(noNodes):
+        for j in range(noNodes):
+            if (weight_matrix[i, j] != 0) and (edges_utilised[i, j] == 0):
+                not_utilised.append([i + 1, j + 1])
+    print(not_utilised)
+
+    mean_of_max = np.mean(max_cars_at_node)
+    print(mean_of_max)
