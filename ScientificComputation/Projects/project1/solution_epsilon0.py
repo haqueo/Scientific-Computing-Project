@@ -4,7 +4,6 @@ import misc
 import numpy as np
 import csv
 import matplotlib.pyplot as plt
-from solution_accident_occurs import max_index_tracker_no30
 
 
 def next_node(path):
@@ -135,35 +134,27 @@ if __name__ == '__main__':
         cars_at_node[51] = int(np.round(cars_at_node[51] * 0.6))
 
         # The temporary weight matrix is updated.
-        temp_wei = update_weight_matrix(0.01, cars_at_node, weight_matrix)
+        temp_wei = update_weight_matrix(float(0), cars_at_node, weight_matrix)
 
         # For the first 180 minutes, 20 cars are injected into node 13.
         if i <= 179:
             cars_at_node[12] += 20
+        print('i is %i' % i )
+        print(cars_at_node)
+        print('cars at node 52 is %i' % cars_at_node[51])
 
     # Find the top 5 most congested nodes.
-    max_index_tracker = [[node + 1, max_cars_at_node[node]] for node in range(noNodes)]
-    top_five = sorted(max_index_tracker, key=lambda node_and_max: -1 * node_and_max[1])[:5]
-    #print(top_five)
+    #max_index_tracker = [[node + 1, max_cars_at_node[node]] for node in range(noNodes)]
+    #top_five = sorted(max_index_tracker, key=lambda node_and_max: -1 * node_and_max[1])[:5]
+    # print(top_five)
 
-    #print(sorted(max_index_tracker, key=lambda node_and_max: -1 * node_and_max[1]))
+    #   print(sorted(max_index_tracker, key=lambda node_and_max: -1 * node_and_max[1]))
+    #
+    # not_utilised = []
+    # for i in range(noNodes):
+    #     for j in range(noNodes):
+    #         if (weight_matrix[i, j] != 0) and (edges_utilised[i, j] == 0):
+    #             not_utilised.append([i + 1, j + 1])
+    # print(not_utilised)
 
-    not_utilised = []
-    for i in range(noNodes):
-        for j in range(noNodes):
-            if (weight_matrix[i, j] != 0) and (edges_utilised[i, j] == 0):
-                not_utilised.append([i + 1, j + 1])
-    #print(not_utilised)
-
-
-    differences = []
-    for k in range(noNodes):
-        if k == 12:
-            differences.append([k, 0]) # ignore when analysing 
-        else:
-            differences.append([k, max_index_tracker[k][1] - max_index_tracker_no30[k][1]])
-    sorted_differences_most = sorted(differences, key=lambda node_and_max: -1 * node_and_max[1])[:5]
-    sorted_differences_least = sorted(differences, key=lambda node_and_max: node_and_max[1])[:5]
-
-    print(sorted_differences_most)
-    print(sorted_differences_least)
+    # system stuck in a sta
