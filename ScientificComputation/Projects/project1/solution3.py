@@ -102,6 +102,9 @@ if __name__ == '__main__':
     # To find the edges utilised (or not utilised), we need a 58x58 matrix of
     # zeros.
     edges_utilised = np.zeros((noNodes, noNodes), dtype=int)
+    cars_at_node[12] = 20
+    temp_wei = update_weight_matrix(0.01,cars_at_node,weight_matrix)
+
 
     # Iterate through the 200 minutes
     for i in range(minutes):
@@ -140,18 +143,21 @@ if __name__ == '__main__':
         cars_at_node = cars_at_node_updated.copy()
         cars_at_node_updated = np.zeros(noNodes, dtype=int)
 
-        # Now we calculate the maximum number of cars at each node in the system.
-        max_cars_at_node = [max(cars_at_node[node], max_cars_at_node[node]) for node in range(noNodes)]
-
         # Now we remove 40% of cars from node 52.
         cars_at_node[51] = int(np.round(cars_at_node[51] * 0.6))
-
-        # The temporary weight matrix is updated.
-        temp_wei = update_weight_matrix(0.01, cars_at_node, weight_matrix)
 
         # For the first 180 minutes, 20 cars are injected into node 13.
         if i <= 179:
             cars_at_node[12] += 20
+
+        # The temporary weight matrix is updated.
+        temp_wei = update_weight_matrix(0.01, cars_at_node, weight_matrix)
+
+
+
+        # Now we calculate the maximum number of cars at each node in the system.
+        max_cars_at_node = [max(cars_at_node[node], max_cars_at_node[node]) for node in range(noNodes)]
+
 
 # ------------------------------------------------------------------------
 # ---------------------    Analytics/questions ---------------------------
@@ -171,6 +177,9 @@ if __name__ == '__main__':
             if (weight_matrix[i, j] != 0) and (edges_utilised[i, j] == 0):
                 not_utilised.append([i, j])
 
+
+
+
     # Question: What flow pattern do we observe for parameter epsilon = 0?
     # see solution_epsilon0.py
 
@@ -188,4 +197,8 @@ if __name__ == '__main__':
 
     sorted_differences_most = sorted(differences, key=lambda node_and_max: -1 * node_and_max[1])[:5]
     sorted_differences_least = sorted(differences, key=lambda node_and_max: node_and_max[1])[:5]
+
+    print(max_cars_at_node)
+
+
 

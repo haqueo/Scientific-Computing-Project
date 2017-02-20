@@ -14,8 +14,8 @@
 \usepackage[utf8]{inputenc}
 
 % default fixed font does not support bold face
-\DeclareFixedFont{\ttb}{T1}{txtt}{bx}{n}{12} % for bold
-\DeclareFixedFont{\ttm}{T1}{txtt}{m}{n}{12}  % for normal
+\DeclareFixedFont{\ttb}{T1}{txtt}{bx}{n}{11} % for bold
+\DeclareFixedFont{\ttm}{T1}{txtt}{m}{n}{11}  % for normal
 
 % custom colors
 \usepackage{color}
@@ -118,7 +118,11 @@ showstringspaces=false            %
 
 \maketitle
 
-\section{Main Solution Code}
+\section{Main Solution}
+
+My solution strategy will focus on following the 5 step algorithm given in the question in its entirety, without focusing on major changes for speedup. However, I will at the same time not store all the values as the cars at each node are updated at each iteration. 
+
+Below are the imports and functions used by the main program. 
 
 \begin{python}
 # imports
@@ -126,7 +130,13 @@ import Dijkstra as dijk
 import misc
 import numpy as np
 import csv
-import matplotlib.pyplot as plt
+# this import is needed for the last question
+from solution_accident_occurs import max_index_tracker_no30
+
+
+# -----------------------------------------------------------
+# --------------    FUNCTIONS USED     ---------------------
+# -----------------------------------------------------------
 
 def next_node(path):
     """ Returns the next index (after the node itself) in the path.
@@ -136,6 +146,7 @@ def next_node(path):
         return path[0]
     else:
         return path[1]
+        
         
 def update_weight_matrix(epsilon, c, original_weight_matrix, noNodes=58):
     """
@@ -160,6 +171,37 @@ def update_weight_matrix(epsilon, c, original_weight_matrix, noNodes=58):
                                                       float(c[j]))) / float(2)
     return new_weight_matrix
 
+def extract_data():
+    """
+    This function opens the RomeVertices and RomeEdges files, and creates
+    global variables RomeX, RomeY, RomeA, RomeB and RomeV. These are variables
+    used to create the original weight matrix.
+
+    """
+    global RomeX, RomeY, RomeA, RomeB, RomeV
+    RomeX = np.empty(0, dtype=float)
+    RomeY = np.empty(0, dtype=float)
+    with open('./data/RomeVertices', 'r') as file:
+        AAA = csv.reader(file)
+        for row in AAA:
+            RomeX = np.concatenate((RomeX, [float(row[1])]))
+            RomeY = np.concatenate((RomeY, [float(row[2])]))
+    file.close()
+    RomeA = np.empty(0, dtype=int)
+    RomeB = np.empty(0, dtype=int)
+    RomeV = np.empty(0, dtype=float)
+    with open('./data/RomeEdges2', 'r') as file:
+        AAA = csv.reader(file)
+        for row in AAA:
+            RomeA = np.concatenate((RomeA, [int(row[0])]))
+            RomeB = np.concatenate((RomeB, [int(row[1])]))
+            RomeV = np.concatenate((RomeV, [float(row[2])]))
+    file.close()
+
 \end{python}
+
+My solution for moving the cars across the graph are as follows.
+
+For each iteration (minute)
 
 \end{document}

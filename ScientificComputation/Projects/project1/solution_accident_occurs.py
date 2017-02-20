@@ -121,6 +121,7 @@ for i in range(minutes):
 
             # Update edges_utilised matrix
             edges_utilised[j_node, node_to_move_to] += 1
+        print(cars_at_node)
 
     # Now all cars have moved where they need to, we set cars_at_node
     # to this updated vector, and empty the updated vector for the next
