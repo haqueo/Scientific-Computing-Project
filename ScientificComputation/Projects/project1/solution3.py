@@ -3,9 +3,13 @@ import Dijkstra as dijk
 import misc
 import numpy as np
 import csv
-import matplotlib.pyplot as plt
+# this import is needed for the last question
 from solution_accident_occurs import max_index_tracker_no30
 
+
+# ------------------------------------------------------------------------
+# ---------------------    FUNCTIONS USED     ----------------------------
+# ------------------------------------------------------------------------
 
 def next_node(path):
     """ Returns the next index (after the node itself) in the path.
@@ -69,6 +73,11 @@ def extract_data():
     file.close()
 
 
+# ------------------------------------------------------------------------
+# ---------------------    Main program     ----------------------------
+# ------------------------------------------------------------------------
+
+
 if __name__ == '__main__':
 
     # Import the rome edges file
@@ -87,9 +96,11 @@ if __name__ == '__main__':
     # Need a vector carNumbers which stores the number of cars at each vertex
     # in the graph.
     cars_at_node = np.zeros(noNodes, dtype=int)
-    cars_at_node_updated = cars_at_node.copy()
-    max_cars_at_node = cars_at_node.copy()
+    cars_at_node_updated = cars_at_node.copy()  # cars_at_node updated is similar
+    max_cars_at_node = cars_at_node.copy()  # max_cars_at_node is similar
 
+    # To find the edges utilised (or not utilised), we need a 58x58 matrix of
+    # zeros.
     edges_utilised = np.zeros((noNodes, noNodes), dtype=int)
 
     # Iterate through the 200 minutes
@@ -104,6 +115,7 @@ if __name__ == '__main__':
         # Move all cars as in steps 2,3. Iterate through every node in the
         # system to do this.
         for j_node in range(noNodes):
+
             # Initialise the number of cars at node j_node.
             number_of_cars = cars_at_node[j_node]
 
@@ -141,29 +153,39 @@ if __name__ == '__main__':
         if i <= 179:
             cars_at_node[12] += 20
 
-    # Find the top 5 most congested nodes.
+# ------------------------------------------------------------------------
+# ---------------------    Analytics/questions ---------------------------
+# ------------------------------------------------------------------------
+
+    # Question: Determine for each node the maximum load (maximum number of cars)
+    # over the 200 iterations.
     max_index_tracker = [[node + 1, max_cars_at_node[node]] for node in range(noNodes)]
+
+    # Question: Which are the five most congested nodes?
     top_five = sorted(max_index_tracker, key=lambda node_and_max: -1 * node_and_max[1])[:5]
-    #print(top_five)
 
-    #print(sorted(max_index_tracker, key=lambda node_and_max: -1 * node_and_max[1]))
-
+    # Question: Which edges are not utilized at all? Why?
     not_utilised = []
     for i in range(noNodes):
         for j in range(noNodes):
             if (weight_matrix[i, j] != 0) and (edges_utilised[i, j] == 0):
                 not_utilised.append([i + 1, j + 1])
-    #print(not_utilised)
 
+    # Question: What flow pattern do we observe for parameter epsilon = 0?
+    # see solution_epsilon0.py
+
+    # Question: An accident occurs at node 30 (python-index 29) which blocks any route to
+    # or from node 30. Which nodes are now the most congested and what is their maximum load?
+    # Which nodes (besides node 30) decrease the most in peak value, which nodes in- crease
+    # the most in peak value?
 
     differences = []
     for k in range(noNodes):
         if k == 12:
-            differences.append([k, 0]) # ignore when analysing 
+            differences.append([k, 0])  # ignore when analysing
         else:
             differences.append([k, max_index_tracker[k][1] - max_index_tracker_no30[k][1]])
+
     sorted_differences_most = sorted(differences, key=lambda node_and_max: -1 * node_and_max[1])[:5]
     sorted_differences_least = sorted(differences, key=lambda node_and_max: node_and_max[1])[:5]
 
-    print(sorted_differences_most)
-    print(sorted_differences_least)
