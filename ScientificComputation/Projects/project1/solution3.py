@@ -159,7 +159,7 @@ if __name__ == '__main__':
 
     # Question: Determine for each node the maximum load (maximum number of cars)
     # over the 200 iterations.
-    max_index_tracker = [[node + 1, max_cars_at_node[node]] for node in range(noNodes)]
+    max_index_tracker = [[node, max_cars_at_node[node]] for node in range(noNodes)]
 
     # Question: Which are the five most congested nodes?
     top_five = sorted(max_index_tracker, key=lambda node_and_max: -1 * node_and_max[1])[:5]
@@ -169,7 +169,7 @@ if __name__ == '__main__':
     for i in range(noNodes):
         for j in range(noNodes):
             if (weight_matrix[i, j] != 0) and (edges_utilised[i, j] == 0):
-                not_utilised.append([i + 1, j + 1])
+                not_utilised.append([i, j])
 
     # Question: What flow pattern do we observe for parameter epsilon = 0?
     # see solution_epsilon0.py

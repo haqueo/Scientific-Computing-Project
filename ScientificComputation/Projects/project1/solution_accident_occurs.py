@@ -142,5 +142,5 @@ for i in range(minutes):
         cars_at_node[12] += 20
 
 # Find the top 5 most congested nodes.
-max_index_tracker_no30 = [[node + 1, max_cars_at_node[node]] for node in range(noNodes)]
+max_index_tracker_no30 = [[node, max_cars_at_node[node]] for node in range(noNodes)]
 
