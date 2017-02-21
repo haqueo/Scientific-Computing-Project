@@ -191,6 +191,9 @@ if __name__ == '__main__':
 
     print(max_cars_at_node)
 
+    a = np.sum((weight_matrix != float(0)) & (np.logical_not(new_edges_utilised)))
+    print('a is %i' % a)
+
 
     # Question: What flow pattern do we observe for parameter epsilon = 0?
     # see solution_epsilon0.py
