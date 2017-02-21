@@ -6,7 +6,7 @@ import csv
 
 
 # this import is needed for the last question
-# from solution_accident_occurs import max_index_tracker_no30
+from solution_accident_occurs import max_index_tracker_no30
 
 
 # ------------------------------------------------------------------------
@@ -91,7 +91,7 @@ if __name__ == '__main__':
     temp_wei = weight_matrix.copy()
 
     # Initialise minutes and number of nodes
-    minutes = 199  # we will only iterate through 199 minutes, and initialise the system as the first iteration
+    minutes = 200  # we will only iterate through 199 minutes, and initialise the system as the first iteration
     noNodes = weight_matrix.shape[0]
 
     # Need a vector carNumbers which stores the number of cars at each vertex
@@ -116,8 +116,8 @@ if __name__ == '__main__':
     # Insert 20 cars into node 13
 
     # Then update the weight matrix. This is exactly the two lines below.
-    cars_at_node[12] = 20
-    temp_wei = update_weight_matrix(0.01, cars_at_node, weight_matrix)
+    # cars_at_node[12] = 20
+    # temp_wei = update_weight_matrix(0.01, cars_at_node, weight_matrix)
 
     # Really we should take the maximum of all nodes again here, but the only
     # one that is greater than 0 is node 13, which becomes greater than 20
@@ -198,14 +198,16 @@ if __name__ == '__main__':
     # or from node 30. Which nodes are now the most congested and what is their maximum load?
     # Which nodes (besides node 30) decrease the most in peak value, which nodes in- crease
     # the most in peak value?
-    #
+
     # need import at top
-    # differences = []
-    # for k in range(noNodes):
-    #     if k == 12:
-    #         differences.append([k, 0])  # ignore when analysing
-    #     else:
-    #         differences.append([k, max_index_tracker[k][1] - max_index_tracker_no30[k][1]])
-    #
-    # sorted_differences_most = sorted(differences, key=lambda node_and_max: -1 * node_and_max[1])[:5]
-    # sorted_differences_least = sorted(differences, key=lambda node_and_max: node_and_max[1])[:5]
+    differences = []
+    for k in range(noNodes):
+        if k == 29:
+            differences.append([k, 0])  # ignore when analysing
+        else:
+            differences.append([k, max_index_tracker[k][1] - max_index_tracker_no30[k][1]])
+
+    sorted_differences_most = sorted(differences, key=lambda node_and_max: -1 * node_and_max[1])[:5]
+    sorted_differences_least = sorted(differences, key=lambda node_and_max: node_and_max[1])[:5]
+    print(sorted_differences_most)
+    print(sorted_differences_least)
