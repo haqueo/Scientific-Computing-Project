@@ -136,33 +136,35 @@ if __name__ == '__main__':
         # system to do this.
         for j_node in range(noNodes):
 
-            # Initialise the number of cars at node j_node.
-            number_of_cars = cars_at_node[j_node]
+            if j_node == 51:
+                # We remove 40% of cars from node 52.
+                cars_at_node_updated[51] += int(round(cars_at_node[51] * 0.6))
+            else:
 
-            # Initialise the next node to move to.
-            node_to_move_to = next_nodes[j_node]
+                # Initialise the number of cars at node j_node.
+                number_of_cars = cars_at_node[j_node]
 
-            # 70% of cars will move. to keep the total conserved, the amount
-            # staying is just number_of_cars - amount_moving
-            amount_moving = int(round(0.7 * number_of_cars))
-            amount_staying = number_of_cars - amount_moving
+                # Initialise the next node to move to.
+                node_to_move_to = next_nodes[j_node]
 
-            # We now update cars_at_node.
-            cars_at_node_updated[j_node] += amount_staying
-            cars_at_node_updated[node_to_move_to] += amount_moving
+                # 70% of cars will move. to keep the total conserved, the amount
+                # staying is just number_of_cars - amount_moving
+                amount_moving = int(round(0.7 * number_of_cars))
+                amount_staying = number_of_cars - amount_moving
 
-            if amount_moving > 0:
-                # Update edges_utilised matrix
-                edge_utilised[j_node, node_to_move_to] = True
+                # We now update cars_at_node.
+                cars_at_node_updated[j_node] += amount_staying
+                cars_at_node_updated[node_to_move_to] += amount_moving
+
+                if amount_moving > 0:
+                    # Update edges_utilised matrix
+                    edge_utilised[j_node, node_to_move_to] = True
 
         # Now all cars have moved where they need to, we set cars_at_node
         # to this updated vector, and empty the updated vector for the next
         # iteration.
         cars_at_node = cars_at_node_updated.copy()
         cars_at_node_updated = np.zeros(noNodes, dtype=int)
-
-        # Now we remove 40% of cars from node 52.
-        cars_at_node[51] = int(round(cars_at_node[51] * 0.6))
 
         # For the first 180 minutes, 20 cars are injected into node 13.
         if i <= 179:
@@ -172,10 +174,7 @@ if __name__ == '__main__':
         temp_wei = update_weight_matrix(0.01, cars_at_node, weight_matrix)
 
         # Now we calculate the maximum number of cars at each node in the system.
-
         max_cars_at_node = [max(cars_at_node[node], max_cars_at_node[node]) for node in range(noNodes)]
-        if i == 197:
-            print(sum(cars_at_node))
 
     # ------------------------------------------------------------------------
     # ---------------------    Analytics/questions ---------------------------
@@ -187,12 +186,10 @@ if __name__ == '__main__':
 
     # Question: Which are the five most congested nodes?
     top_five = sorted(max_index_tracker, key=lambda node_and_max: -1 * node_and_max[1])[:5]
-    print(top_five)
+
     # Question: Which edges are not utilized at all? Why?
     non_utilised_edges_matrix = (weight_matrix != float(0)) & (np.logical_not(edge_utilised))
     non_utilised_edges = [[i, j] for i in range(noNodes) for j in range(noNodes) if non_utilised_edges_matrix[i, j]]
-    print('length of new vector is %i' % len(non_utilised_edges))
-    print(non_utilised_edges)
 
     # Question: What flow pattern do we observe for parameter epsilon = 0?
     # see solution_epsilon0.py
