@@ -3,8 +3,10 @@ import Dijkstra as dijk
 import misc
 import numpy as np
 import csv
+
+
 # this import is needed for the last question
-#from solution_accident_occurs import max_index_tracker_no30
+# from solution_accident_occurs import max_index_tracker_no30
 
 
 # ------------------------------------------------------------------------
@@ -72,10 +74,9 @@ def extract_data():
             RomeV = np.concatenate((RomeV, [float(row[2])]))
     file.close()
 
-
-# ------------------------------------------------------------------------
-# ---------------------    Main program     ----------------------------
-# ------------------------------------------------------------------------
+    # ----------------------------------------------------------------------
+    # ---------------------    Main program     ----------------------------
+    # ----------------------------------------------------------------------
 
 
 if __name__ == '__main__':
@@ -90,7 +91,7 @@ if __name__ == '__main__':
     temp_wei = weight_matrix.copy()
 
     # Initialise minutes and number of nodes
-    minutes = 199
+    minutes = 199  # we will only iterate through 199 minutes, and initialise the system as the first iteration
     noNodes = weight_matrix.shape[0]
 
     # Need a vector carNumbers which stores the number of cars at each vertex
@@ -99,20 +100,30 @@ if __name__ == '__main__':
     cars_at_node_updated = cars_at_node.copy()  # cars_at_node updated is similar
     max_cars_at_node = cars_at_node.copy()  # max_cars_at_node is similar
 
-    # To find the edges utilised (or not utilised), we need a 58x58 matrix of
-    # zeros.
-    edges_utilised = np.zeros((noNodes, noNodes), dtype=int)
-    new_edges_utilised = np.zeros((noNodes,noNodes),dtype=bool)
+    # To find the edges utilised, we need a 58x58 matrix of
+    # False's. We will set each element to True if we move
+    # cars from node i to node j.
+    edge_utilised = np.zeros((noNodes, noNodes), dtype=bool)
 
+    # Initialisation step. (iteration 1 out of 200)
+    # Really, this is the same as the for loop below:
+    #
+    # We move the cars around according to Dijkstra's algorithm
+    # (there are none, so nothing moves).
+    #
+    # Remove cars from node 52 (again, nothing happens)
+    #
+    # Insert 20 cars into node 13
 
-
-
-
+    # Then update the weight matrix. This is exactly the two lines below.
     cars_at_node[12] = 20
-    temp_wei = update_weight_matrix(0.01,cars_at_node,weight_matrix)
+    temp_wei = update_weight_matrix(0.01, cars_at_node, weight_matrix)
 
+    # Really we should take the maximum of all nodes again here, but the only
+    # one that is greater than 0 is node 13, which becomes greater than 20
+    # on the next iteration anyway.
 
-    # Iterate through the 200 minutes
+    # Iterate through the 199 minutes
     for i in range(minutes):
 
         # Apply Dijkstra's algorithm to find the fastest path to node 52 in
@@ -142,8 +153,7 @@ if __name__ == '__main__':
 
             if amount_moving > 0:
                 # Update edges_utilised matrix
-                edges_utilised[j_node,node_to_move_to] += 1
-                new_edges_utilised[j_node,node_to_move_to] = True
+                edge_utilised[j_node, node_to_move_to] = True
 
         # Now all cars have moved where they need to, we set cars_at_node
         # to this updated vector, and empty the updated vector for the next
@@ -161,17 +171,15 @@ if __name__ == '__main__':
         # The temporary weight matrix is updated.
         temp_wei = update_weight_matrix(0.01, cars_at_node, weight_matrix)
 
-
-
-
-
         # Now we calculate the maximum number of cars at each node in the system.
+
         max_cars_at_node = [max(cars_at_node[node], max_cars_at_node[node]) for node in range(noNodes)]
+        if i == 197:
+            print(sum(cars_at_node))
 
-
-# ------------------------------------------------------------------------
-# ---------------------    Analytics/questions ---------------------------
-# ------------------------------------------------------------------------
+    # ------------------------------------------------------------------------
+    # ---------------------    Analytics/questions ---------------------------
+    # ------------------------------------------------------------------------
 
     # Question: Determine for each node the maximum load (maximum number of cars)
     # over the 200 iterations.
@@ -179,21 +187,12 @@ if __name__ == '__main__':
 
     # Question: Which are the five most congested nodes?
     top_five = sorted(max_index_tracker, key=lambda node_and_max: -1 * node_and_max[1])[:5]
-
+    print(top_five)
     # Question: Which edges are not utilized at all? Why?
-    not_utilised = []
-    for i in range(noNodes):
-        for j in range(noNodes):
-            if (weight_matrix[i, j] != float(0)) and (edges_utilised[i,j] == 0):
-                not_utilised.append([i, j])
-
-    print('number of non utilised edges is %i' % len(not_utilised))
-
-    print(max_cars_at_node)
-
-    a = np.sum((weight_matrix != float(0)) & (np.logical_not(new_edges_utilised)))
-    print('a is %i' % a)
-
+    non_utilised_edges_matrix = (weight_matrix != float(0)) & (np.logical_not(edge_utilised))
+    non_utilised_edges = [[i, j] for i in range(noNodes) for j in range(noNodes) if non_utilised_edges_matrix[i, j]]
+    print('length of new vector is %i' % len(non_utilised_edges))
+    print(non_utilised_edges)
 
     # Question: What flow pattern do we observe for parameter epsilon = 0?
     # see solution_epsilon0.py
@@ -213,6 +212,3 @@ if __name__ == '__main__':
     #
     # sorted_differences_most = sorted(differences, key=lambda node_and_max: -1 * node_and_max[1])[:5]
     # sorted_differences_least = sorted(differences, key=lambda node_and_max: node_and_max[1])[:5]
-
-
-
