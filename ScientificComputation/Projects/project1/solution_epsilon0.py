@@ -174,40 +174,18 @@ if __name__ == '__main__':
         # Now we calculate the maximum number of cars at each node in the system.
         max_cars_at_node = [max(cars_at_node[node], max_cars_at_node[node]) for node in range(noNodes)]
 
+        # print('i is %i' % i)
+        # see the distribution of cars
+        # print(cars_at_node)
+
     # ------------------------------------------------------------------------
-    # ---------------------    Analytics/questions ---------------------------
+    # ---------------------    Analytics --------- ---------------------------
     # ------------------------------------------------------------------------
-
-    # Question: Determine for each node the maximum load (maximum number of cars)
-    # over the 200 iterations.
-    max_index_tracker = [[node, max_cars_at_node[node]] for node in range(noNodes)]
-
-    # Question: Which are the five most congested nodes?
-    top_five = sorted(max_index_tracker, key=lambda node_and_max: -1 * node_and_max[1])[:5]
-
-    # Question: Which edges are not utilized at all? Why?
-    non_utilised_edges_matrix = (weight_matrix != float(0)) & (np.logical_not(edge_utilised))
-    non_utilised_edges = [[i, j] for i in range(noNodes) for j in range(noNodes) if non_utilised_edges_matrix[i, j]]
-
-    # Question: What flow pattern do we observe for parameter epsilon = 0?
-    # see solution_epsilon0.py
-
-    # Question: An accident occurs at node 30 (python-index 29) which blocks any route to
-    # or from node 30. Which nodes are now the most congested and what is their maximum load?
-    # Which nodes (besides node 30) decrease the most in peak value, which nodes in- crease
-    # the most in peak value?
-    #
-    # need import at top
-    # differences = []
-    # for k in range(noNodes):
-    #     if k == 12:
-    #         differences.append([k, 0])  # ignore when analysing
-    #     else:
-    #         differences.append([k, max_index_tracker[k][1] - max_index_tracker_no30[k][1]])
-    #
-    # sorted_differences_most = sorted(differences, key=lambda node_and_max: -1 * node_and_max[1])[:5]
-    # sorted_differences_least = sorted(differences, key=lambda node_and_max: node_and_max[1])[:5]
 
     # regular dijkstra's path
     print('the Dijkstra\'s path is ')
-    print(dijk.Dijkst(12,41,weight_matrix))
+    print(dijk.Dijkst(12, 51, weight_matrix))
+
+    utilised_edges = [[i, j] for i in range(noNodes) for j in range(noNodes) if edge_utilised[i, j]]
+    print('number of utilised edges is')
+    print(utilised_edges)
