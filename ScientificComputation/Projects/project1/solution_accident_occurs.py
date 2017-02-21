@@ -103,7 +103,7 @@ for i in range(minutes):
     # Move all cars as in steps 2,3. Iterate through every node in the
     # system to do this.
     for j_node in range(noNodes):
-        if j_node != 29:
+        if (j_node != 29) and (next_nodes[j_node] != 29):
             # Initialise the number of cars at node j_node.
             number_of_cars = cars_at_node[j_node]
 
@@ -121,7 +121,7 @@ for i in range(minutes):
 
             # Update edges_utilised matrix
             edges_utilised[j_node, node_to_move_to] += 1
-        print(cars_at_node)
+
 
     # Now all cars have moved where they need to, we set cars_at_node
     # to this updated vector, and empty the updated vector for the next
@@ -145,3 +145,4 @@ for i in range(minutes):
 # Find the top 5 most congested nodes.
 max_index_tracker_no30 = [[node, max_cars_at_node[node]] for node in range(noNodes)]
 
+print(max_index_tracker_no30)
