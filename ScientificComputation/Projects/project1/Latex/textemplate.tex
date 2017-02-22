@@ -34,6 +34,8 @@
 \usetikzlibrary{calc}
 \usetikzlibrary{patterns,fadings}
 
+\graphicspath{ {images/} }
+
 % python style for highlighting
 \newcommand\pythonstyle{\lstset{
 language=Python,
@@ -393,5 +395,85 @@ if __name__ == '__main__':
 \end{python}
 
 \section{Questions}
+
+\textbf{Determine for each node the maximum load (maximum number of cars) over the 200 iterations.}
+\newline
+
+As we have already incorporated the calculation of maximums in the loop, this is easy:
+
+\begin{python}
+max_index_tracker = [[node+1, max_cars_at_node[node]]
+                         for node in range(total_nodes)]
+\end{python}
+
+Thus the i'th element of this array gives [node i, maximum number of cars of node i over the 200 iterations ]. The code to print and run is below
+
+\begin{python}
+print('max_index_tracker is')
+print(max_index_tracker[0:10])
+print(max_index_tracker[10:20])
+print(max_index_tracker[20:30])
+print(max_index_tracker[30:40])
+print(max_index_tracker[40:50])
+print(max_index_tracker[50:59])
+\end{python}
+
+\includegraphics[scale=0.7]{max_index.png}
+\leavevmode
+\newline
+
+\textbf{Which are the five most congested nodes?} \newline
+Given this array \textit{max\_index\_tracker}, we can simply sort by the second argument to find the top five most congested nodes
+\begin{python}
+top_five = sorted(max_index_tracker,
+                      key=lambda node_and_max: -1 * node_and_max[1])[:5]
+print('the five most congested nodes are')
+print(top_five)
+\end{python}
+\includegraphics{top_five.png}
+
+In other words, the top five most congested nodes (from highest to lowest) is node 52 with 63 cars, node 25 with 40 cars, node 21 with 38 cars, node 30 with 32 cars and node 43 with 31 cars.
+\newline
+
+
+\textbf{Which edges are not utilized at all? Why?}
+\leavevmode
+\newline
+
+In the main program we defined a 58x58 boolean matrix of False's, where throughout the process if cars moved from index i to index j, we made the [i,j] element of the matrix True.
+\leavevmode
+\newline
+
+Thus, we have a matrix where indices (corresponding to edges) are \textit{True} if they are traversed by some cars ($ > 0$) in the 200 minute process.
+\leavevmode
+\newline
+
+All that is left to do is count the number of False's, making sure that we don't count a False if the edge couldn't be traversed to begin with (in the original weight matrix). This corresponds to an element of the original weight matrix being 0.
+
+\begin{python}
+# create a boolean matrix that corresponds to the condition
+# described above
+non_utilised_edges_matrix = (weight_matrix != float(0)) \
+                                & (np.logical_not(edge_utilised))
+                                
+non_utilised_edges = [[i+1, j+1] for i in range(total_nodes)
+                          for j in range(total_nodes)
+                          if non_utilised_edges_matrix[i, j]]
+
+\end{python}
+
+So an element $[l,m]$ belonging to this vector \textit{non\_utilised\_edges} implies that the edge $l \to m$ is not utilised.
+
+
+
+
+
+
+
+
+
+
+
+
 
 \end{document}

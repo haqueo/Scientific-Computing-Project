@@ -37,6 +37,7 @@ def calcWei(RX, RY, RA, RB, RV):
         wei[RA[i] - 1, RB[i] - 1] = tt
     return wei
 
+
 def Dijkst(ist, isp, wei):
     """
     This Dijkstra's algorithm implementation is taken from tutorials.
@@ -97,6 +98,7 @@ def Dijkst(ist, isp, wei):
     shpath.append(ist)
 
     return shpath[::-1]
+
 
 def next_node(path):
     """ Returns the next index (after the node itself) in the path.
@@ -253,20 +255,34 @@ if __name__ == '__main__':
     # Question: Determine for each node the maximum load (maximum number of cars)
     # over the 200 iterations.
 
-    max_index_tracker = [[node+1, max_cars_at_node[node]]
+    max_index_tracker = [[node + 1, max_cars_at_node[node]]
                          for node in range(total_nodes)]
-    print(max_index_tracker)
+    print('max_index_tracker is')
+    print(max_index_tracker[0:10])
+    print(max_index_tracker[10:20])
+    print(max_index_tracker[20:30])
+    print(max_index_tracker[30:40])
+    print(max_index_tracker[40:50])
+    print(max_index_tracker[50:59])
 
     # Question: Which are the five most congested nodes?
 
-    top_five = sorted(max_index_tracker, key=lambda node_and_max: -1 * node_and_max[1])[:5]
+    top_five = sorted(max_index_tracker,
+                      key=lambda node_and_max: -1 * node_and_max[1])[:5]
+    print('the five most congested nodes are')
+    print(top_five)
 
     # Question: Which edges are not utilized at all? Why?
 
-    non_utilised_edges_matrix = (weight_matrix != float(0)) & (np.logical_not(edge_utilised))
-    non_utilised_edges = [[i, j] for i in range(total_nodes) for j in range(total_nodes) if non_utilised_edges_matrix[i, j]]
+    non_utilised_edges_matrix = (weight_matrix != float(0)) \
+                                & (np.logical_not(edge_utilised))
+
+    non_utilised_edges = [[i+1, j+1] for i in range(total_nodes)
+                          for j in range(total_nodes)
+                          if non_utilised_edges_matrix[i, j]]
+    print(non_utilised_edges)
     # long explanation to follow
-    print(len(non_utilised_edges))
+    # print(len(non_utilised_edges))
 
     # Question: What flow pattern do we observe for parameter epsilon = 0?
 
@@ -290,5 +306,5 @@ if __name__ == '__main__':
 
     sorted_differences_most = sorted(differences, key=lambda node_and_max: -1 * node_and_max[1])[:5]
     sorted_differences_least = sorted(differences, key=lambda node_and_max: node_and_max[1])[:5]
-    print(sorted_differences_most)
-    print(sorted_differences_least)
+    # print(sorted_differences_most)
+    # print(sorted_differences_least)
