@@ -1,8 +1,8 @@
 # Imports
-import misc
 import numpy as np
 import csv
 import sys
+import math as ma
 
 # This import is needed for the last question
 from solution_accident_occurs import max_index_tracker_no30
@@ -12,11 +12,40 @@ from solution_accident_occurs import max_index_tracker_no30
 # ---------------------    FUNCTIONS USED     ----------------------------
 # ------------------------------------------------------------------------
 
+def calcWei(RX, RY, RA, RB, RV):
+    """
+    This function is taken from Tutorials. It calculates the weight matrix
+    given information about each node in the system.
+    :param RX: The x coordinates of each node in the system
+    :param RY: The y coordinates of each node in the system
+    :param RA: the connectivity of each node in the system
+    :param RB: the connectivity of each node in the system
+    :param RV: the speed limits across each edge in the system
+    :return: usable weight matrix
+    """
+
+    n = len(RX)
+    wei = np.zeros((n, n), dtype=float)
+    m = len(RA)
+    for i in range(m):
+        xa = RX[RA[i] - 1]
+        ya = RY[RA[i] - 1]
+        xb = RX[RB[i] - 1]
+        yb = RY[RB[i] - 1]
+        dd = ma.sqrt((xb - xa) ** 2 + (yb - ya) ** 2)
+        tt = dd / RV[i]
+        wei[RA[i] - 1, RB[i] - 1] = tt
+    return wei
+
 def Dijkst(ist, isp, wei):
-    # Dijkstra algorithm for shortest path in a graph
-    #    ist: index of starting node
-    #    isp: index of stopping node
-    #    wei: weight matrix
+    """
+    This Dijkstra's algorithm implementation is taken from tutorials.
+
+    :param ist: the index of the starting node
+    :param isp: the index of the node to reach
+    :param wei: the assosciated weight matrix
+    :return:
+    """
 
     # exception handling (start = stop)
     if ist == isp:
@@ -143,23 +172,23 @@ if __name__ == '__main__':
     # Use the calcWei function from tutorials, along with the data set given
     # to calculate the weight matrix. Also create a copy which is the
     # temporary weight matrix.
-    weight_matrix = misc.calcWei(RomeX, RomeY, RomeA, RomeB, RomeV)
+    weight_matrix = calcWei(RomeX, RomeY, RomeA, RomeB, RomeV)
     temp_wei = weight_matrix.copy()
 
     # Initialise minutes and number of nodes
     minutes = 200
-    noNodes = weight_matrix.shape[0]
+    total_nodes = weight_matrix.shape[0]
 
     # Need a vector carNumbers which stores the number of cars at each vertex
     # in the graph.
-    cars_at_node = np.zeros(noNodes, dtype=int)
+    cars_at_node = np.zeros(total_nodes, dtype=int)
     cars_at_node_updated = cars_at_node.copy()  # cars_at_node updated is similar
     max_cars_at_node = cars_at_node.copy()  # max_cars_at_node is similar
 
     # To find the edges utilised, we need a 58x58 matrix of
     # False's. We will set each element to True if we move
     # cars from node i to node j.
-    edge_utilised = np.zeros((noNodes, noNodes), dtype=bool)
+    edge_utilised = np.zeros((total_nodes, total_nodes), dtype=bool)
 
     # Iterate through the 200 minutes
     for i in range(minutes):
@@ -168,11 +197,11 @@ if __name__ == '__main__':
         # the system. Then use next_node to find the next node in the given
         # path. (step 1)
         next_nodes = [next_node(Dijkst(node, 51, temp_wei))
-                      for node in range(noNodes)]
+                      for node in range(total_nodes)]
 
         # Move all cars as in steps 2,3. Iterate through every node in the
         # system to do this.
-        for j_node in range(noNodes):
+        for j_node in range(total_nodes):
 
             if j_node == 51:
                 # We remove 40% of cars from node 52.
@@ -202,7 +231,7 @@ if __name__ == '__main__':
         # to this updated vector, and empty the updated vector for the next
         # iteration.
         cars_at_node = cars_at_node_updated.copy()
-        cars_at_node_updated = np.zeros(noNodes, dtype=int)
+        cars_at_node_updated = np.zeros(total_nodes, dtype=int)
 
         # For the first 180 minutes, 20 cars are injected into node 13.
         if i <= 179:
@@ -214,7 +243,8 @@ if __name__ == '__main__':
         # We have finished an iteration.
 
         # Now we calculate the maximum number of cars at each node in the system.
-        max_cars_at_node = [max(cars_at_node[node], max_cars_at_node[node]) for node in range(noNodes)]
+        max_cars_at_node = [max(cars_at_node[node], max_cars_at_node[node])
+                            for node in range(total_nodes)]
 
     # ------------------------------------------------------------------------
     # ---------------------    Analytics/questions ---------------------------
@@ -223,7 +253,8 @@ if __name__ == '__main__':
     # Question: Determine for each node the maximum load (maximum number of cars)
     # over the 200 iterations.
 
-    max_index_tracker = [[node, max_cars_at_node[node]] for node in range(noNodes)]
+    max_index_tracker = [[node, max_cars_at_node[node]] for node in range(total_nodes)]
+
 
     # Question: Which are the five most congested nodes?
 
@@ -232,8 +263,9 @@ if __name__ == '__main__':
     # Question: Which edges are not utilized at all? Why?
 
     non_utilised_edges_matrix = (weight_matrix != float(0)) & (np.logical_not(edge_utilised))
-    non_utilised_edges = [[i, j] for i in range(noNodes) for j in range(noNodes) if non_utilised_edges_matrix[i, j]]
+    non_utilised_edges = [[i, j] for i in range(total_nodes) for j in range(total_nodes) if non_utilised_edges_matrix[i, j]]
     # long explanation to follow
+    print(len(non_utilised_edges))
 
     # Question: What flow pattern do we observe for parameter epsilon = 0?
 
