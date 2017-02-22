@@ -6,7 +6,7 @@ import csv
 
 
 # this import is needed for the last question
-from solution_accident_occurs import max_index_tracker_no30
+#from solution_accident_occurs import max_index_tracker_no30
 
 
 # ------------------------------------------------------------------------
@@ -91,7 +91,7 @@ if __name__ == '__main__':
     temp_wei = weight_matrix.copy()
 
     # Initialise minutes and number of nodes
-    minutes = 200  # we will only iterate through 199 minutes, and initialise the system as the first iteration
+    minutes = 200
     noNodes = weight_matrix.shape[0]
 
     # Need a vector carNumbers which stores the number of cars at each vertex
@@ -105,25 +105,7 @@ if __name__ == '__main__':
     # cars from node i to node j.
     edge_utilised = np.zeros((noNodes, noNodes), dtype=bool)
 
-    # Initialisation step. (iteration 1 out of 200)
-    # Really, this is the same as the for loop below:
-    #
-    # We move the cars around according to Dijkstra's algorithm
-    # (there are none, so nothing moves).
-    #
-    # Remove cars from node 52 (again, nothing happens)
-    #
-    # Insert 20 cars into node 13
-
-    # Then update the weight matrix. This is exactly the two lines below.
-    # cars_at_node[12] = 20
-    # temp_wei = update_weight_matrix(0.01, cars_at_node, weight_matrix)
-
-    # Really we should take the maximum of all nodes again here, but the only
-    # one that is greater than 0 is node 13, which becomes greater than 20
-    # on the next iteration anyway.
-
-    # Iterate through the 199 minutes
+    # Iterate through the 200 minutes
     for i in range(minutes):
 
         # Apply Dijkstra's algorithm to find the fastest path to node 52 in
@@ -173,6 +155,8 @@ if __name__ == '__main__':
         # The temporary weight matrix is updated.
         temp_wei = update_weight_matrix(0.01, cars_at_node, weight_matrix)
 
+        # We have finished an iteration.
+
         # Now we calculate the maximum number of cars at each node in the system.
         max_cars_at_node = [max(cars_at_node[node], max_cars_at_node[node]) for node in range(noNodes)]
 
@@ -182,16 +166,21 @@ if __name__ == '__main__':
 
     # Question: Determine for each node the maximum load (maximum number of cars)
     # over the 200 iterations.
+    
     max_index_tracker = [[node, max_cars_at_node[node]] for node in range(noNodes)]
 
     # Question: Which are the five most congested nodes?
+
     top_five = sorted(max_index_tracker, key=lambda node_and_max: -1 * node_and_max[1])[:5]
 
     # Question: Which edges are not utilized at all? Why?
+
     non_utilised_edges_matrix = (weight_matrix != float(0)) & (np.logical_not(edge_utilised))
     non_utilised_edges = [[i, j] for i in range(noNodes) for j in range(noNodes) if non_utilised_edges_matrix[i, j]]
+    # long explanation to follow
 
     # Question: What flow pattern do we observe for parameter epsilon = 0?
+
     # see solution_epsilon0.py
 
     # Question: An accident occurs at node 30 (python-index 29) which blocks any route to
@@ -199,13 +188,16 @@ if __name__ == '__main__':
     # Which nodes (besides node 30) decrease the most in peak value, which nodes in- crease
     # the most in peak value?
 
+    # see solution_accident_occurs.py to see how the weight matrix is adjusted to find
+    # max_index_tracker_no30.
+
     # need import at top
     differences = []
-    for k in range(noNodes):
-        if k == 29:
-            differences.append([k, 0])  # ignore when analysing
-        else:
-            differences.append([k, max_index_tracker[k][1] - max_index_tracker_no30[k][1]])
+    # for k in range(noNodes):
+    #     if k == 29:
+    #         differences.append([k, 0])  # ignore when analysing
+    #     else:
+    #         differences.append([k, max_index_tracker[k][1] - max_index_tracker_no30[k][1]])
 
     sorted_differences_most = sorted(differences, key=lambda node_and_max: -1 * node_and_max[1])[:5]
     sorted_differences_least = sorted(differences, key=lambda node_and_max: node_and_max[1])[:5]
