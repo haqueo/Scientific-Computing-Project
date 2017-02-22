@@ -481,13 +481,25 @@ print(non_utilised_edges[60:(len(non_utilised_edges)+1)])
 
 Now I answer \textit{why} these edges aren't utilised. 
 
-Firstly we note that from the first question where we found the maximum load for all cars over the 200 iterations, it is clear that 
+Firstly we note that from the first question where we found the maximum load for all cars over the 200 iterations, it is clear that nodes with maximum load 0 (i.e. node 3, 5, 8 etc) will always appear on this list since they were never visited. However, the real question is \textit{why} they were never visited. \\
 
-For a lot of these edges [a,b], they are moving completely in the opposite direction that the straight line drawn from node a to node 52 would go.
+If we perform Dijkstra's algorithm on the original weight matrix and find the fastest route form node 13 to 52, we find this:
 
+\begin{python}
+print(Dijkst(12,51,weight_matrix))
+\end{python}
 
+\includegraphics{normalpath}
 
+note that these are the python indices and not the actual node numbers.
 
+If we look at the diagram, this means without taking the effect of congestion, the fastest path throughout the city is almost completely at the bottom of the map, by the river. Such as $40 \to 50 \to 51$. This means that it is unlikely for a car to need to travel through the upper west side of the city, such as through nodes 1,3,5 and 2. The only way the shortest path for a car could include such nodes is if the rest of the city is \textit{so} congested that the shortest path will indeed require these upper left nodes. We can see that edges like [3,2], [8,9] are not optimal for this reason, and are thus unused.
+
+However for the vast majority of unused edges, it is intuitively clear that the reason they are included is because they are pointing completely away from the direction towards node 52. For example, I have highlighted edges $4 \to 1$, $12 \to 4$ and $52 \to 58$ in the diagram below.
+
+\includegraphics[scale=0.6]{drawngraph}
+ 
+These edges in particular are not only in the wrong in the x direction, but wrong in the y direction too. I have created the function below to count how many of these unused edges are pointing \textit{completely} in the wrong direction
 
 
 

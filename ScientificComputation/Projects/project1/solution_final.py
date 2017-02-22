@@ -374,3 +374,5 @@ if __name__ == '__main__':
             newunused.remove(edge)
 
     print(newunused)
+
+    print(Dijkst(12,51,weight_matrix))
