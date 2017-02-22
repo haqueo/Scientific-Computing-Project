@@ -39,7 +39,7 @@
 language=Python,
 backgroundcolor=\color{lightblue},
 basicstyle=\ttm,
-otherkeywords={self,def},             % add keywords here
+    % add keywords here
 keywordstyle=\ttb\color{deepblue},
 emph={while,for,if,elif,else,def,as,shape,conj,dot,copy,flatten,eye,zeros,ones,hstack,vstack,real,imag,conjugate,sin,cos,exp,append,insert,index,__main__}, % custom highlighting
 %emphstyle=\ttb\color{deepred},     % custom highlighting style
@@ -120,23 +120,26 @@ showstringspaces=false            %
 
 \section{Main Solution}
 
-My solution strategy will focus on following the 5 step algorithm given in the question in its entirety, without focusing on major changes for speedup. However, I will at the same time not store all the values as the cars at each node are updated at each iteration. 
+The code in \textit{solution.py} contains the main program which carries out the process outlined by the question, i.e modelling the process of the cars moving across the city of Rome using the rules described. I have added scripts \textit{to be added} and \textit{to be added} to help answer the related questions at the end of the project.
+\newline
 
-Below are the imports and functions used by the main program. 
+Below are the imports used by the main program.
+
 
 \begin{python}
-# imports
+# Imports
 import Dijkstra as dijk
 import misc
 import numpy as np
 import csv
-# this import is needed for the last question
+
+# This import is needed for the last question
 from solution_accident_occurs import max_index_tracker_no30
 
 
-# -----------------------------------------------------------
-# --------------    FUNCTIONS USED     ---------------------
-# -----------------------------------------------------------
+# ------------------------------------------------
+# -----------    FUNCTIONS USED     --------------
+# ------------------------------------------------
 
 def next_node(path):
     """ Returns the next index (after the node itself) in the path.
@@ -146,8 +149,8 @@ def next_node(path):
         return path[0]
     else:
         return path[1]
-        
-        
+
+
 def update_weight_matrix(epsilon, c, original_weight_matrix, noNodes=58):
     """
     This function updates the weight matrix according to step 5 of the
@@ -170,6 +173,7 @@ def update_weight_matrix(epsilon, c, original_weight_matrix, noNodes=58):
                                           (epsilon * (float(c[i]) +
                                                       float(c[j]))) / float(2)
     return new_weight_matrix
+
 
 def extract_data():
     """

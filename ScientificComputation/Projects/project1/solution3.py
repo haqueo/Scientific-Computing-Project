@@ -1,17 +1,73 @@
-# imports
-import Dijkstra as dijk
+# Imports
 import misc
 import numpy as np
 import csv
+import sys
 
-
-# this import is needed for the last question
-#from solution_accident_occurs import max_index_tracker_no30
+# This import is needed for the last question
+from solution_accident_occurs import max_index_tracker_no30
 
 
 # ------------------------------------------------------------------------
 # ---------------------    FUNCTIONS USED     ----------------------------
 # ------------------------------------------------------------------------
+
+def Dijkst(ist, isp, wei):
+    # Dijkstra algorithm for shortest path in a graph
+    #    ist: index of starting node
+    #    isp: index of stopping node
+    #    wei: weight matrix
+
+    # exception handling (start = stop)
+    if ist == isp:
+        shpath = [ist]
+        return shpath
+
+    # initialization
+    N = len(wei)
+    Inf = sys.maxint
+    UnVisited = np.ones(N, int)
+    cost = np.ones(N) * 1.e6
+    par = -np.ones(N, int) * Inf
+
+    # set the source point and get its (unvisited) neighbors
+    jj = ist
+    cost[jj] = 0
+    UnVisited[jj] = 0
+    tmp = UnVisited * wei[jj, :]
+    ineigh = np.array(tmp.nonzero()).flatten()
+    L = np.array(UnVisited.nonzero()).flatten().size
+
+    # start Dijkstra algorithm
+    while (L != 0):
+        # step 1: update cost of unvisited neighbors,
+        #         compare and (maybe) update
+        for k in ineigh:
+            newcost = cost[jj] + wei[jj, k]
+            if (newcost < cost[k]):
+                cost[k] = newcost
+                par[k] = jj
+
+        # step 2: determine minimum-cost point among UnVisited
+        #         vertices and make this point the new point
+        icnsdr = np.array(UnVisited.nonzero()).flatten()
+        cmin, icmin = cost[icnsdr].min(0), cost[icnsdr].argmin(0)
+        jj = icnsdr[icmin]
+
+        # step 3: update "visited"-status and determine neighbors of new point
+        UnVisited[jj] = 0
+        tmp = UnVisited * wei[jj, :]
+        ineigh = np.array(tmp.nonzero()).flatten()
+        L = np.array(UnVisited.nonzero()).flatten().size
+
+    # determine the shortest path
+    shpath = [isp]
+    while par[isp] != ist:
+        shpath.append(par[isp])
+        isp = par[isp]
+    shpath.append(ist)
+
+    return shpath[::-1]
 
 def next_node(path):
     """ Returns the next index (after the node itself) in the path.
@@ -111,7 +167,7 @@ if __name__ == '__main__':
         # Apply Dijkstra's algorithm to find the fastest path to node 52 in
         # the system. Then use next_node to find the next node in the given
         # path. (step 1)
-        next_nodes = [next_node(dijk.Dijkst(node, 51, temp_wei))
+        next_nodes = [next_node(Dijkst(node, 51, temp_wei))
                       for node in range(noNodes)]
 
         # Move all cars as in steps 2,3. Iterate through every node in the
@@ -166,7 +222,7 @@ if __name__ == '__main__':
 
     # Question: Determine for each node the maximum load (maximum number of cars)
     # over the 200 iterations.
-    
+
     max_index_tracker = [[node, max_cars_at_node[node]] for node in range(noNodes)]
 
     # Question: Which are the five most congested nodes?
