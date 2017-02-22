@@ -166,10 +166,58 @@ def extract_data():
     # ----------------------------------------------------------------------
 
 
+def away_from_52(edge):
+    """
+
+    :param edge: an edge of the form [a,b]
+    :return: boolean whether or not this points to or away from 52
+    """
+
+    # extract data for access to global variables
+    extract_data()
+
+    # the edge is of the form [a,b]
+    a = edge[0]
+    b = edge[1]
+
+    # use RomeX and RomeY to find the coordinates for a,b and node 52.
+    a_coord = [RomeX[a - 1], RomeY[a - 1]]
+    b_coord = [RomeX[b - 1], RomeY[b - 1]]
+    coord52 = [RomeX[51], RomeY[51]]
+
+    # find the change in x/y from a -> b
+    x_change = b_coord[0] - a_coord[0]
+    y_change = b_coord[1] - a_coord[1]
+
+    # find the change in x/y from a -> 52
+    x_changeTo52 = coord52[0] - a_coord[0]
+    y_changeto52 = coord52[1] - a_coord[1]
+
+    # if we're at 52 we're moving away from it
+    if a == 52:
+        return True
+
+    # if both point in same direction, false.
+    if (x_changeTo52 > 0) and (x_change > 0):
+        return False
+    elif (x_changeTo52 < 0) and (x_change < 0):
+        return False
+
+    # if both point in same direction, false.
+    if (y_changeto52 > 0) and (y_change > 0):
+        return False
+    elif (y_changeto52 < 0) and (y_change < 0):
+        return False
+
+    # all other tests have passed, so must be True.
+    return True
+
+
 if __name__ == '__main__':
 
     # Import the rome edges file
     extract_data()
+    print(RomeX.shape)
 
     # Use the calcWei function from tutorials, along with the data set given
     # to calculate the weight matrix. Also create a copy which is the
@@ -257,30 +305,38 @@ if __name__ == '__main__':
 
     max_index_tracker = [[node + 1, max_cars_at_node[node]]
                          for node in range(total_nodes)]
-    print('max_index_tracker is')
-    print(max_index_tracker[0:10])
-    print(max_index_tracker[10:20])
-    print(max_index_tracker[20:30])
-    print(max_index_tracker[30:40])
-    print(max_index_tracker[40:50])
-    print(max_index_tracker[50:59])
+    # print('max_index_tracker is')
+    # print(max_index_tracker[0:10])
+    # print(max_index_tracker[10:20])
+    # print(max_index_tracker[20:30])
+    # print(max_index_tracker[30:40])
+    # print(max_index_tracker[40:50])
+    # print(max_index_tracker[50:(len(max_index_tracker)+1)])
 
     # Question: Which are the five most congested nodes?
 
     top_five = sorted(max_index_tracker,
                       key=lambda node_and_max: -1 * node_and_max[1])[:5]
-    print('the five most congested nodes are')
-    print(top_five)
+    # print('the five most congested nodes are')
+    # print(top_five)
 
     # Question: Which edges are not utilized at all? Why?
 
     non_utilised_edges_matrix = (weight_matrix != float(0)) \
                                 & (np.logical_not(edge_utilised))
 
-    non_utilised_edges = [[i+1, j+1] for i in range(total_nodes)
+    non_utilised_edges = [[i + 1, j + 1] for i in range(total_nodes)
                           for j in range(total_nodes)
                           if non_utilised_edges_matrix[i, j]]
-    print(non_utilised_edges)
+    # print('the non utilised edges are')
+    # print(non_utilised_edges[0:10])
+    # print(non_utilised_edges[10:20])
+    # print(non_utilised_edges[20:30])
+    # print(non_utilised_edges[30:40])
+    # print(non_utilised_edges[40:50])
+    # print(non_utilised_edges[50:60])
+    # print(non_utilised_edges[60:(len(non_utilised_edges)+1)])
+
     # long explanation to follow
     # print(len(non_utilised_edges))
 
@@ -308,3 +364,13 @@ if __name__ == '__main__':
     sorted_differences_least = sorted(differences, key=lambda node_and_max: node_and_max[1])[:5]
     # print(sorted_differences_most)
     # print(sorted_differences_least)
+    print()
+
+
+    newunused = list(non_utilised_edges)
+
+    for _, edge in enumerate(non_utilised_edges):
+        if away_from_52(edge):
+            newunused.remove(edge)
+
+    print(newunused)

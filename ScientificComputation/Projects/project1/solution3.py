@@ -282,11 +282,11 @@ if __name__ == '__main__':
 
     # need import at top
     differences = []
-    # for k in range(noNodes):
-    #     if k == 29:
-    #         differences.append([k, 0])  # ignore when analysing
-    #     else:
-    #         differences.append([k, max_index_tracker[k][1] - max_index_tracker_no30[k][1]])
+    for k in range(total_nodes):
+        if k == 29:
+            differences.append([k, 0])  # ignore when analysing
+        else:
+            differences.append([k, max_index_tracker[k][1] - max_index_tracker_no30[k][1]])
 
     sorted_differences_most = sorted(differences, key=lambda node_and_max: -1 * node_and_max[1])[:5]
     sorted_differences_least = sorted(differences, key=lambda node_and_max: node_and_max[1])[:5]

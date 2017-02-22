@@ -406,7 +406,7 @@ max_index_tracker = [[node+1, max_cars_at_node[node]]
                          for node in range(total_nodes)]
 \end{python}
 
-Thus the i'th element of this array gives [node i, maximum number of cars of node i over the 200 iterations ]. The code to print and run is below
+Thus the i'th element of this array gives [node i, maximum number of cars of node i over the 200 iterations ]. The code to print is below along with the output.
 
 \begin{python}
 print('max_index_tracker is')
@@ -415,7 +415,7 @@ print(max_index_tracker[10:20])
 print(max_index_tracker[20:30])
 print(max_index_tracker[30:40])
 print(max_index_tracker[40:50])
-print(max_index_tracker[50:59])
+print(max_index_tracker[50:(len(max_index_tracker)+1)])
 \end{python}
 
 \includegraphics[scale=0.7]{max_index.png}
@@ -444,7 +444,7 @@ In the main program we defined a 58x58 boolean matrix of False's, where througho
 \leavevmode
 \newline
 
-Thus, we have a matrix where indices (corresponding to edges) are \textit{True} if they are traversed by some cars ($ > 0$) in the 200 minute process.
+Thus, we have a matrix where indices (corresponding to edges) are \textit{True} if they are traversed by some amount of cars ($ > 0$) in the 200 minute process.
 \leavevmode
 \newline
 
@@ -464,8 +464,26 @@ non_utilised_edges = [[i+1, j+1] for i in range(total_nodes)
 
 So an element $[l,m]$ belonging to this vector \textit{non\_utilised\_edges} implies that the edge $l \to m$ is not utilised.
 
+The code to print this and the output is below.
 
+\begin{python}
+print('the non utilised edges are')
+print(non_utilised_edges[0:10])
+print(non_utilised_edges[10:20])
+print(non_utilised_edges[20:30])
+print(non_utilised_edges[30:40])
+print(non_utilised_edges[40:50])
+print(non_utilised_edges[50:60])
+print(non_utilised_edges[60:(len(non_utilised_edges)+1)])
+\end{python}
 
+\includegraphics[scale=0.65]{non_utilised_edges}
+
+Now I answer \textit{why} these edges aren't utilised. 
+
+Firstly we note that from the first question where we found the maximum load for all cars over the 200 iterations, it is clear that 
+
+For a lot of these edges [a,b], they are moving completely in the opposite direction that the straight line drawn from node a to node 52 would go.
 
 
 
