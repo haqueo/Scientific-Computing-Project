@@ -161,11 +161,6 @@ def extract_data():
             RomeV = np.concatenate((RomeV, [float(row[2])]))
     file.close()
 
-    # ----------------------------------------------------------------------
-    # ---------------------    Main program     ----------------------------
-    # ----------------------------------------------------------------------
-
-
 def away_from_52(edge):
     """
     Tells you whether a given edge is pointing completely away from
@@ -213,12 +208,18 @@ def away_from_52(edge):
     # all other tests have passed, so must be True.
     return True
 
+    # ----------------------------------------------------------------------
+    # ---------------------    Main program     ----------------------------
+    # ----------------------------------------------------------------------
+
+
+
+
 
 if __name__ == '__main__':
 
     # Import the rome edges file
     extract_data()
-    print(RomeX.shape)
 
     # Use the calcWei function from tutorials, along with the data set given
     # to calculate the weight matrix. Also create a copy which is the
@@ -355,18 +356,24 @@ if __name__ == '__main__':
 
     # need import at top
 
-    top_ten = sorted(max_index_tracker_no30,key=lambda node_and_max: -1*node_and_max[1])[:10]
-    print(top_ten)
-    
+    top_eight = sorted(max_index_tracker_no30,
+                       key=lambda node_and_max: -1 * node_and_max[1])[:8]
+    print(top_eight)
+
     differences = []
     for k in range(total_nodes):
         if k == 29:
-            differences.append([k, 0])  # ignore when analysing
+            differences.append([k+1, 0])  # ignore when analysing
         else:
-            differences.append([k, max_index_tracker[k][1] - max_index_tracker_no30[k][1]])
+            differences.append([k+1, max_index_tracker[k][1]
+                                - max_index_tracker_no30[k][1]])
 
-    sorted_differences_most = sorted(differences, key=lambda node_and_max: -1 * node_and_max[1])[:5]
-    sorted_differences_least = sorted(differences, key=lambda node_and_max: node_and_max[1])[:5]
+    sorted_differences_most = \
+        sorted(differences,
+               key=lambda node_and_max: -1 * node_and_max[1])[:8]
+    sorted_differences_least = \
+        sorted(differences,
+               key=lambda node_and_max: node_and_max[1])[:8]
     print(sorted_differences_most)
     print(sorted_differences_least)
 

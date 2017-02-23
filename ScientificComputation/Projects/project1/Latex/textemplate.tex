@@ -122,7 +122,7 @@ showstringspaces=false            %
 
 \section{Main Solution}
 
-The code in \textit{solution.py} contains the main program which carries out the process outlined by the question, i.e modelling the process of the cars moving across the city of Rome using the rules described. I have added scripts \textit{to be added} and \textit{to be added} to help answer the related questions at the end of the project.
+The code in \textit{solution\_final.py} contains the main program which carries out the process outlined by the question, i.e modelling the process of the cars moving across the city of Rome using the rules described. I have added scripts \textit{solution\_epsilon0.py} and \textit{solution\_accident\_occurs} to help answer the related questions at the end of the project.
 \newline
 
 Below are the imports used by the main program.
@@ -144,7 +144,8 @@ the variable \textit{max\_index\_tracker\_no30} is imported from another python 
 \leavevmode
 \newline
 
-Below are the functions required by the program. The docstring's explain their use.
+Below are the functions required by the program. The docstring's explain their use.\
+note: I will explain the use of the function away\_from\_52 properly later in the document.
 
 \leavevmode
 \newline
@@ -300,7 +301,56 @@ def extract_data():
             RomeB = np.concatenate((RomeB, [int(row[1])]))
             RomeV = np.concatenate((RomeV, [float(row[2])]))
     file.close()
+    
+def away_from_52(edge):
+    """
+    Tells you whether a given edge is pointing completely away from
+    node 52, in both the x and y directions.
+    :param edge: an edge of the form [a,b]
+    :return: boolean whether or not this points to or away from 52
+    """
+
+    # extract data for access to global variables
+    extract_data()
+
+    # the edge is of the form [a,b]
+    a = edge[0]
+    b = edge[1]
+
+    # use RomeX and RomeY to find the coordinates for a,b and node 52.
+    a_coord = [RomeX[a - 1], RomeY[a - 1]]
+    b_coord = [RomeX[b - 1], RomeY[b - 1]]
+    coord52 = [RomeX[51], RomeY[51]]
+
+    # find the change in x/y from a -> b
+    x_change = b_coord[0] - a_coord[0]
+    y_change = b_coord[1] - a_coord[1]
+
+    # find the change in x/y from a -> 52
+    x_changeTo52 = coord52[0] - a_coord[0]
+    y_changeto52 = coord52[1] - a_coord[1]
+
+    # if we're at 52 we're moving away from it
+    if a == 52:
+        return True
+
+    # if both point in same direction, false.
+    if (x_changeTo52 > 0) and (x_change > 0):
+        return False
+    elif (x_changeTo52 < 0) and (x_change < 0):
+        return False
+
+    # if both point in same direction, false.
+    if (y_changeto52 > 0) and (y_change > 0):
+        return False
+    elif (y_changeto52 < 0) and (y_change < 0):
+        return False
+
+    # all other tests have passed, so must be True.
+    return True
 \end{python}
+
+
 
 Now using these functions, we can execute the main program.
 
@@ -395,8 +445,8 @@ if __name__ == '__main__':
 \end{python}
 
 \section{Questions}
-
-\textbf{Determine for each node the maximum load (maximum number of cars) over the 200 iterations.}
+\begin{enumerate}
+\item \textbf{Determine for each node the maximum load (maximum number of cars) over the 200 iterations.}
 \newline
 
 As we have already incorporated the calculation of maximums in the loop, this is easy:
@@ -418,11 +468,13 @@ print(max_index_tracker[40:50])
 print(max_index_tracker[50:(len(max_index_tracker)+1)])
 \end{python}
 
-\includegraphics[scale=0.7]{max_index.png}
-\leavevmode
-\newline
+\begin{figure}[h]
+\caption{output of maximum loads}
+\centering
+\includegraphics[width=1.1\textwidth]{max_index.png}
+\end{figure}
 
-\textbf{Which are the five most congested nodes?} \newline
+\item \textbf{Which are the five most congested nodes?} \newline
 Given this array \textit{max\_index\_tracker}, we can simply sort by the second argument to find the top five most congested nodes
 \begin{python}
 top_five = sorted(max_index_tracker,
@@ -430,13 +482,18 @@ top_five = sorted(max_index_tracker,
 print('the five most congested nodes are')
 print(top_five)
 \end{python}
-\includegraphics{top_five.png}
+
+\begin{figure}[h]
+\caption{top five most congested nodes output}
+\centering
+\includegraphics[width=0.9\textwidth]{top_five.png}
+\end{figure}
 
 In other words, the top five most congested nodes (from highest to lowest) is node 52 with 63 cars, node 25 with 40 cars, node 21 with 38 cars, node 30 with 32 cars and node 43 with 31 cars.
 \newline
 
 
-\textbf{Which edges are not utilized at all? Why?}
+\item \textbf{Which edges are not utilized at all? Why?}
 \leavevmode
 \newline
 
@@ -477,7 +534,11 @@ print(non_utilised_edges[50:60])
 print(non_utilised_edges[60:(len(non_utilised_edges)+1)])
 \end{python}
 
-\includegraphics[scale=0.65]{non_utilised_edges}
+\begin{figure}[h]
+\caption{list of non utilised edges output}
+\centering
+\includegraphics[width=1.00\textwidth]{non_utilised_edges}
+\end{figure}
 
 Now I answer \textit{why} these edges aren't utilised. 
 
@@ -489,7 +550,12 @@ If we perform Dijkstra's algorithm on the original weight matrix and find the fa
 print(Dijkst(12,51,weight_matrix))
 \end{python}
 
-\includegraphics{normalpath}
+\begin{figure}[h]
+\caption{Dijkstra's algorithm path from 13 to 52 (python indices)}
+\centering
+\includegraphics[width=0.9\textwidth]{normalpath}
+\end{figure}
+
 
 note that these are the python indices and not the actual node numbers.
 
@@ -497,7 +563,11 @@ If we look at the diagram, this means without taking the effect of congestion, t
 
 However for the vast majority of unused edges, it is intuitively clear that the reason they are included is because they are pointing completely away from the direction towards node 52. For example, I have highlighted edges $4 \to 1$, $12 \to 4$ and $52 \to 58$ in the diagram below.
 
-\includegraphics[scale=0.6]{drawngraph}
+\begin{figure}[h]
+\caption{City of Rome graph map with drawn edges}
+\centering
+\includegraphics[width=0.8\textwidth]{drawngraph}
+\end{figure}
  
 These edges in particular are not only in the wrong in the x direction, but wrong in the y direction too. I have created the function below to count how many of these unused edges are pointing \textit{completely} in the wrong direction
 
@@ -562,11 +632,15 @@ for _, edge in enumerate(non_utilised_edges):
 print('length of new_unused is %i' % len(new_unused))
 \end{python}
 
-\includegraphics{new_unused}
+\begin{figure}[h]
+\caption{length of new\_unused list}
+\centering
+\includegraphics[width=0.6\textwidth]{new_unused}
+\end{figure}
 
 So out of 71 unused edges, 41 of them were facing completely away from node 52. In a similar way we can remove nodes that are facing away from node 52 in the x direction only. This, coupled with the discussion above about unused nodes describes why these edges are not utilised by the cars.
 
-\textbf{What flow pattern do we observe for parameter $\epsilon = 0$?}
+\item \textbf{What flow pattern do we observe for parameter $\epsilon = 0$?}
 
 See the \textit{solution\_epsilon0.py} file. The main program is exactly the same, but for one change. I have replaced epsilon = 0.01 with epsilon = float(0) where we update the weight matrix in the main for loop.
 
@@ -603,12 +677,16 @@ print('the utilised edges are')
 print(utilised_edges)
 \end{python}
 
-\includegraphics[scale=0.7]{dijk}
+\begin{figure}[h]
+\caption{Dijkstra's path with utilised edges output (both in Python indices for clarity)}
+\centering
+\includegraphics[width=1.1\textwidth]{dijk}
+\end{figure}
 
 Since all of these edges have a distinct head to tail connection, I can be sure the cars follow the path in the order we expect.
 
 
-\textbf{An accident occurs at node 30 (python-index 29) which blocks any route to or from node 30. Which nodes are now the most congested and what is their maximum load? Which nodes (besides node 30) decrease the most in peak value, which nodes in- crease the most in peak value?}
+\item \textbf{An accident occurs at node 30 (python-index 29) which blocks any route to or from node 30. Which nodes are now the most congested and what is their maximum load? Which nodes (besides node 30) decrease the most in peak value, which nodes in- crease the most in peak value?}
 
 See \textit{solution\_accident\_occurs.py}. The main code is exactly the same as before, but for these changes:
 
@@ -666,5 +744,52 @@ max_index_tracker_no30 = [[node+1, max_cars_at_node[node]]
 
 Now, back in \textit{solution\_final.py} we compare and print the required values.
 
+\begin{python}
+top_eight = sorted(max_index_tracker_no30, 
+                       key=lambda node_and_max: -1 * node_and_max[1])[:8]
+print(top_eight)
+\end{python}
 
+These are the top 8 most congested nodes when node 30 is blocked.
+
+\begin{figure}[h]
+\caption{Top 8 most congested nodes with maximum loads when node 30 is blocked}
+\centering
+\includegraphics[width=1.1\textwidth]{30block}
+\end{figure}
+
+\leavevmode
+\newline
+
+
+
+Now we find the nodes which increase/decrease the most in peak value.
+
+\begin{python}
+    differences = []
+    for k in range(total_nodes):
+        if k == 29:
+            differences.append([k+1, 0])  # ignore when analysing
+        else:
+            differences.append([k+1, max_index_tracker[k][1] 
+                                - max_index_tracker_no30[k][1]])
+
+    sorted_differences_most = \
+        sorted(differences, 
+               key=lambda node_and_max: -1 * node_and_max[1])[:8]
+    sorted_differences_least = \
+        sorted(differences, 
+               key=lambda node_and_max: node_and_max[1])[:8]
+    print(sorted_differences_most)
+    print(sorted_differences_least)
+\end{python}
+
+\begin{figure}[h]
+\caption{The top 8 nodes which increased the most in peak value, followed by (next line) the top 8 nodes that decreased the most in peak value, all with their peak values.}
+\centering
+\includegraphics[width=1.1\textwidth]{top8}
+\end{figure}
+
+These elements represents the node number and the difference in maximum load from before to when node 30 is congested.
+\end{enumerate}
 \end{document}
