@@ -168,7 +168,8 @@ def extract_data():
 
 def away_from_52(edge):
     """
-
+    Tells you whether a given edge is pointing completely away from
+    node 52, in both the x and y directions.
     :param edge: an edge of the form [a,b]
     :return: boolean whether or not this points to or away from 52
     """
@@ -367,12 +368,10 @@ if __name__ == '__main__':
     print()
 
 
-    newunused = list(non_utilised_edges)
+    new_unused = list(non_utilised_edges)
 
     for _, edge in enumerate(non_utilised_edges):
         if away_from_52(edge):
-            newunused.remove(edge)
+            new_unused.remove(edge)
 
-    print(newunused)
-
-    print(Dijkst(12,51,weight_matrix))
+    print('length of new_unused is %i' % len(new_unused))
