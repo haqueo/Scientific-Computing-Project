@@ -186,6 +186,8 @@ if __name__ == '__main__':
     print('the Dijkstra\'s path is ')
     print(dijk.Dijkst(12, 51, weight_matrix))
 
-    utilised_edges = [[i, j] for i in range(noNodes) for j in range(noNodes) if edge_utilised[i, j]]
-    print('number of utilised edges is')
+    utilised_edges = [[i, j] for i in range(noNodes)
+                      for j in range(noNodes)
+                      if edge_utilised[i, j]]
+    print('the utilised edges are')
     print(utilised_edges)

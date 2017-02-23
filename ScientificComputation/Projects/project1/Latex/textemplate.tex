@@ -565,4 +565,106 @@ print('length of new_unused is %i' % len(new_unused))
 \includegraphics{new_unused}
 
 So out of 71 unused edges, 41 of them were facing completely away from node 52. In a similar way we can remove nodes that are facing away from node 52 in the x direction only. This, coupled with the discussion above about unused nodes describes why these edges are not utilised by the cars.
+
+\textbf{What flow pattern do we observe for parameter $\epsilon = 0$?}
+
+See the \textit{solution\_epsilon0.py} file. The main program is exactly the same, but for one change. I have replaced epsilon = 0.01 with epsilon = float(0) where we update the weight matrix in the main for loop.
+
+\begin{python}
+temp_wei = update_weight_matrix(float(0), cars_at_node, weight_matrix)
+\end{python}
+
+Now, if we consider the formula for the adjusted weight matrix at each iteration, where $w_{ij} = w_{ij}^{(0)} + \epsilon \frac{c_{i} + c_{j}}{2}$, we see that the weight matrix remains unchanged.
+
+As discussed in lectures, Dijkstra's algorithm is an example of a greedy algorithm. Since the time discrete process we are modelling uses Dijkstra's algorithm one node at a time (with the same weight matrix), we know that the shortest path from node 13 to node 52 will remain constant throughout the process.
+
+Furthermore, let P be a node on the shortest path between node 13 and 52,
+
+$$ 13 \to .. \to \ P \to p_{1} \to ... \to p_{n-1} \to 52 $$
+
+Then the shortest path from node P to node 52 is 
+
+$$ P \to p_{1} \to ... \to p_{n-1} \to 52 $$
+
+Since the weight matrix is unchanged. If the shortest path between node P and node 52 were anything else then the shortest path between node 13 and node 52 would not be $13 \to ... \to P \to p_{1} \to ... \to p_{n-1} \to 52$.
+
+In other words, finding the shortest path from node to node with a constant weight matrix is the same as finding the overall shortest path using the same weight matrix. We can simply use the utilised edges to see that the flow of cars in the system follows this path. Printing the cars\_at\_node vector throughout the 200 minutes verifies this.
+
+\begin{python}
+# regular dijkstra's path
+print('the Dijkstra\'s path is ')
+print(dijk.Dijkst(12, 51, weight_matrix))
+
+utilised_edges = [[i, j] for i in range(noNodes) 
+                  for j in range(noNodes) 
+                  if edge_utilised[i, j]] # this matrix is defined in the main 
+                  			       #code
+print('the utilised edges are')
+print(utilised_edges)
+\end{python}
+
+\includegraphics[scale=0.7]{dijk}
+
+Since all of these edges have a distinct head to tail connection, I can be sure the cars follow the path in the order we expect.
+
+
+\textbf{An accident occurs at node 30 (python-index 29) which blocks any route to or from node 30. Which nodes are now the most congested and what is their maximum load? Which nodes (besides node 30) decrease the most in peak value, which nodes in- crease the most in peak value?}
+
+See \textit{solution\_accident\_occurs.py}. The main code is exactly the same as before, but for these changes:
+
+Since no car can reach node 30, we need to make the 30th row and 30th column of the weight matrix equal to 0s. 
+
+\begin{python}
+# Use the calcWei function from tutorials, along with the data set given
+# to calculate the weight matrix. Also create a copy which is the
+# temporary weight matrix.
+weight_matrix = calcWei(RomeX, RomeY, RomeA, RomeB, RomeV)
+
+# The accident at node 30 means that the 30th row and 30th column is all 0
+weight_matrix[29, :] = np.zeros(58, dtype=float)
+weight_matrix[:, 29] = np.zeros(58, dtype=float)
+
+temp_wei = weight_matrix.copy()
+\end{python}
+
+Once we begin the for loop iterating through the 200 minutes, we compute the next nodes as before. But there is no path between node 30 and 52, so we add this "if node!=29" statement to the next\_nodes calculation.
+
+We also insert a 0 at index 29, so the nodes align properly again.
+
+\begin{python}
+# Iterate through the 200 minutes
+for i in range(minutes):
+
+    # Apply Dijkstra's algorithm to find the fastest path to node 52 in
+    # the system. Then use next_node to find the next node in the given
+    # path. (step 1)
+    next_nodes = [next_node(Dijkst(node, 51, temp_wei))
+                  for node in range(total_nodes) if node != 29]
+
+    next_nodes.insert(29, 29)  # send the 0 cars from 29 to itself
+\end{python}
+
+We can ignore node 30 when moving the cars through the system, so we add this else if statement.
+
+\begin{python}
+ for j_node in range(total_nodes):
+
+        if j_node == 51:
+            # We remove 40% of cars from node 52.
+            cars_at_node_updated[51] += int(round(cars_at_node[51] * 0.6))
+            # really, we can just ignore node 30.
+        elif j_node != 29:
+\end{python}
+
+Now we create this variable max\_index\_tracker\_no30, which is simply the array of all the nodes with the maximum load they carry over the 200 iterations. This is then imported into the \textit{solution\_final.py} file as outlined before.
+
+\begin{python}
+# Find the top 5 most congested nodes.
+max_index_tracker_no30 = [[node+1, max_cars_at_node[node]]
+                          for node in range(total_nodes)]
+\end{python}
+
+Now, back in \textit{solution\_final.py} we compare and print the required values.
+
+
 \end{document}
