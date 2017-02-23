@@ -161,6 +161,7 @@ def extract_data():
             RomeV = np.concatenate((RomeV, [float(row[2])]))
     file.close()
 
+
 def away_from_52(edge):
     """
     Tells you whether a given edge is pointing completely away from
@@ -211,9 +212,6 @@ def away_from_52(edge):
     # ----------------------------------------------------------------------
     # ---------------------    Main program     ----------------------------
     # ----------------------------------------------------------------------
-
-
-
 
 
 if __name__ == '__main__':
@@ -363,9 +361,9 @@ if __name__ == '__main__':
     differences = []
     for k in range(total_nodes):
         if k == 29:
-            differences.append([k+1, 0])  # ignore when analysing
+            differences.append([k + 1, 0])  # ignore when analysing
         else:
-            differences.append([k+1, max_index_tracker[k][1]
+            differences.append([k + 1, max_index_tracker[k][1]
                                 - max_index_tracker_no30[k][1]])
 
     sorted_differences_most = \
@@ -376,8 +374,6 @@ if __name__ == '__main__':
                key=lambda node_and_max: node_and_max[1])[:8]
     print(sorted_differences_most)
     print(sorted_differences_least)
-
-
 
     new_unused = list(non_utilised_edges)
 
