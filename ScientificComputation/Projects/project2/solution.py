@@ -1,6 +1,6 @@
 import csv
 import numpy as np
-
+import sys
 
 def node_finish(node):
     return node + 13
@@ -59,9 +59,49 @@ def generate_connectivity(file_name):
 
     return dataframe
 
-
 def updated_bellman_ford(ist, isp, wei):
-    pass
+    # ----------------------------------
+    #  ist:    index of starting node
+    #  isp:    index of stopping node
+    #  wei:    adjacency matrix (V x V)
+    #
+    #  shpath: shortest path
+    # ----------------------------------
+
+    V = wei.shape[1]
+
+    # step 1: initialization
+    Inf = sys.maxint
+    d = np.ones((V), float) * np.inf
+    p = np.zeros((V), int) * Inf
+    d[ist] = 0
+
+    # step 2: iterative relaxation
+    for i in range(0, V - 1):
+        for u in range(0, V):
+            for v in range(0, V):
+                w = wei[u, v]
+                if (w != 1):
+                    if d[u] + w < d[v]:
+                        d[v] = d[u] + w
+                        p[v] = u
+
+    # step 3: check for negative-weight cycles
+    for u in range(0, V):
+        for v in range(0, V):
+            w = wei[u, v]
+            if (w != 0):
+                if (d[u] + w < d[v]):
+                    print('graph contains a negative-weight cycle')
+
+    # step 4: determine the shortest path
+    shpath = [isp]
+    while p[isp] != ist:
+        shpath.append(p[isp])
+        isp = p[isp]
+    shpath.append(ist)
+
+    return shpath[::-1]
 
 
 if __name__ == '__main__':
@@ -69,3 +109,9 @@ if __name__ == '__main__':
     data = generate_connectivity('./data/jobslist')
 
     weights = generate_weight_matrix(data)
+
+    adjusted_weights = -1*weights
+
+    print(updated_bellman_ford(26,27,adjusted_weights))
+
+    [26,0,13,1,1,4,4,27]
