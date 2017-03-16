@@ -23,3 +23,10 @@ def test_matrixgeneration(): # test passed
     assert data[9][1] == 49
     assert data[10][2] == [12]
     assert data[0][2] == [1,7,10]
+
+def test_longest_path():
+    data = s.generate_connectivity('./data/jobslist')
+    weights = s.generate_weight_matrix(data)
+    adjusted_weights = -1*weights
+
+    assert s.updated_bellman_ford(26,27,adjusted_weights) == [26, 0, 13, 1, 14, 4, 17, 27]

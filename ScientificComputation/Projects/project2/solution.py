@@ -2,6 +2,7 @@ import csv
 import numpy as np
 import sys
 
+
 def node_finish(node):
     return node + 13
 
@@ -25,8 +26,8 @@ def generate_weight_matrix(data):
     ## virtual finish = 27
     ## nodes = 13
 
-    weight_matrix[26,0:13] = 0
-    weight_matrix[13:26,27] = 0
+    weight_matrix[26, 0:13] = 0
+    weight_matrix[13:26, 27] = 0
 
     return weight_matrix
 
@@ -58,6 +59,7 @@ def generate_connectivity(file_name):
     dataframe = np.column_stack((job, duration, completed_before))
 
     return dataframe
+
 
 def updated_bellman_ford(ist, isp, wei):
     # ----------------------------------
@@ -110,8 +112,9 @@ if __name__ == '__main__':
 
     weights = generate_weight_matrix(data)
 
-    adjusted_weights = -1*weights
+    adjusted_weights = -1 * weights
 
-    print(updated_bellman_ford(26,27,adjusted_weights))
+    path = updated_bellman_ford(26, 27, adjusted_weights)
+    longest_path = path[1:len(path)-1][::2]
 
-    [26,0,13,1,1,4,4,27]
+    print(longest_path)
