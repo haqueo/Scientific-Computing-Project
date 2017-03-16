@@ -153,7 +153,7 @@ def extract_data():
     RomeA = np.empty(0, dtype=int)
     RomeB = np.empty(0, dtype=int)
     RomeV = np.empty(0, dtype=float)
-    with open('./data/RomeEdges2', 'r') as file:
+    with open('./data/RomeEdges', 'r') as file:
         AAA = csv.reader(file)
         for row in AAA:
             RomeA = np.concatenate((RomeA, [int(row[0])]))
@@ -340,6 +340,17 @@ if __name__ == '__main__':
     # long explanation to follow
     # print(len(non_utilised_edges))
 
+
+    new_unused = list(non_utilised_edges)
+
+    for _, edge in enumerate(non_utilised_edges):
+        if away_from_52(edge):
+            new_unused.remove(edge)
+    print(new_unused[0:10])
+    print(new_unused[10:20])
+    print(new_unused[20:31])
+    print('length of new_unused is %i' % len(new_unused))
+
     # Question: What flow pattern do we observe for parameter epsilon = 0?
 
     # see solution_epsilon0.py
@@ -363,8 +374,8 @@ if __name__ == '__main__':
         if k == 29:
             differences.append([k + 1, 0])  # ignore when analysing
         else:
-            differences.append([k + 1, max_index_tracker[k][1]
-                                - max_index_tracker_no30[k][1]])
+            differences.append([k + 1, max_index_tracker_no30[k][1]
+                                - max_index_tracker[k][1]])
 
     sorted_differences_most = \
         sorted(differences,
@@ -375,10 +386,3 @@ if __name__ == '__main__':
     print(sorted_differences_most)
     print(sorted_differences_least)
 
-    new_unused = list(non_utilised_edges)
-
-    for _, edge in enumerate(non_utilised_edges):
-        if away_from_52(edge):
-            new_unused.remove(edge)
-
-    print('length of new_unused is %i' % len(new_unused))

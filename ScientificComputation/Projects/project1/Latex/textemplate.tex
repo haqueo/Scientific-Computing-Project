@@ -120,7 +120,42 @@ showstringspaces=false            %
 
 \maketitle
 
-\section{Main Solution}
+\section{Solution Strategy}
+
+I will follow a simple algorithm for simulating the traffic flow through this system.
+
+Obviously I will have to iterate through the 200 minutes, and in each minute I will follow this process.
+
+\begin{enumerate}
+\item Use Dijkstra's algorithm and the temporary weight matrix to find and record where each node needs to go next
+\item Move all the cars to their new locations, and keep where required (70-30 split)
+\item Inject 20 cars into node 13
+\item Update the temporary weight matrix
+\item Update the vector of maximums
+\end{enumerate}
+
+In my solution, I will start with a vector of 58 0s which I will call cars\_at\_node. Throughout the process cars\_at\_node[i] will refer to the number of cars at the node with index i. I will initialise the vector with 0s, and continue with steps 1 - 6 as above. \newline
+
+\textit{Step 1} is self explanatory. But for the first iteration I will need to set the temporary weight matrix equal to the original weight matrix.
+\leavevmode
+\newline
+
+\textit{Step 2} requires some work. Firstly, it is not enough to iterate through cars\_at\_node alone, as you cannot iterate through a vector you are updating (due to overwriting), so I need to introduce a new vector of 58 0s, cars\_at\_node\_updated. 
+
+Then, I will iterate through all the nodes in the system, and find how many cars need to stay and move using the original vector cars\_at\_node. I will then insert them into their appropriate positions (given by step 1) into cars\_at\_node\_updated, being careful to cumulatively add them so previous information is not lost.
+
+This process is the same for all nodes except node 52, where I will need a separate if statement in order to simply remove 40\% of cars from the node. (Again, updating cars\_at\_node\_updated and not cars\_at\_node.
+
+After iterating through cars\_at\_node and updating cars\_at\_node\_updated, I will set cars\_at\_node equal to cars\_at\_node\_updated as all cars have now moved to their new location (or not, if they were in the 30\% that stayed). And finally, I will set cars\_at\_node\_updated equal to 0s ready for the next iteration. \\
+
+\textit{Step 3} is easy. \\
+
+\textit{Step 4} I will use the rules given in the question, namely $w_{ij} = w_{ij}^{(0)} + \epsilon \frac{c_{i} + c_{j}}{2}$. \\
+
+\textit{Step 5} I will use the fact that: maximum load of node j at time i+1 = maximum(maximum load of node j at time i,number of cars at node j at time i+1)
+
+
+\section{Main Solution Code}
 
 The code in \textit{solution\_final.py} contains the main program which carries out the process outlined by the question, i.e modelling the process of the cars moving across the city of Rome using the rules described. I have added scripts \textit{solution\_epsilon0.py} and \textit{solution\_accident\_occurs} to help answer the related questions at the end of the project.
 \newline
@@ -542,26 +577,8 @@ print(non_utilised_edges[60:(len(non_utilised_edges)+1)])
 
 Now I answer \textit{why} these edges aren't utilised. 
 
-Firstly we note that from the first question where we found the maximum load for all cars over the 200 iterations, it is clear that nodes with maximum load 0 (i.e. node 3, 5, 8 etc) will always appear on this list since they were never visited. However, the real question is \textit{why} they were never visited. \\
 
-If we perform Dijkstra's algorithm on the original weight matrix and find the fastest route form node 13 to 52, we find this:
-
-\begin{python}
-print(Dijkst(12,51,weight_matrix))
-\end{python}
-
-\begin{figure}[h]
-\caption{Dijkstra's algorithm path from 13 to 52 (python indices)}
-\centering
-\includegraphics[width=0.9\textwidth]{normalpath}
-\end{figure}
-
-
-note that these are the python indices and not the actual node numbers.
-
-If we look at the diagram, this means without taking the effect of congestion, the fastest path throughout the city is almost completely at the bottom of the map, by the river. Such as $40 \to 50 \to 51$. This means that it is unlikely for a car to need to travel through the upper west side of the city, such as through nodes 1,3,5 and 2. The only way the shortest path for a car could include such nodes is if the rest of the city is \textit{so} congested that the shortest path will indeed require these upper left nodes. We can see that edges like [3,2], [8,9] are not optimal for this reason, and are thus unused.
-
-However for the vast majority of unused edges, it is intuitively clear that the reason they are included is because they are pointing completely away from the direction towards node 52. For example, I have highlighted edges $4 \to 1$, $12 \to 4$ and $52 \to 58$ in the diagram below.
+For the vast majority of unused edges, it is intuitively clear that the reason they are included is because they are pointing completely away from the direction towards node 52. For example, I have highlighted edges $4 \to 1$, $12 \to 4$ and $52 \to 58$ in figure 3.4.
 
 \begin{figure}[h]
 \caption{City of Rome graph map with drawn edges}
@@ -569,7 +586,14 @@ However for the vast majority of unused edges, it is intuitively clear that the 
 \includegraphics[width=0.8\textwidth]{drawngraph}
 \end{figure}
  
-These edges in particular are not only in the wrong in the x direction, but wrong in the y direction too. I have created the function below to count how many of these unused edges are pointing \textit{completely} in the wrong direction
+These edges in particular are not only in the wrong in the x direction, but wrong in the y direction too. I have created the function \textit{away\_from\_52} below to return a boolean depending on whether a given edge is pointing completely away from node 52. i.e. in both x and y direction.
+
+\leavevmode
+\newline
+\leavevmode
+\newline
+
+
 
 \begin{python}
 def away_from_52(edge):
@@ -638,7 +662,53 @@ print('length of new_unused is %i' % len(new_unused))
 \includegraphics[width=0.6\textwidth]{new_unused}
 \end{figure}
 
-So out of 71 unused edges, 41 of them were facing completely away from node 52. In a similar way we can remove nodes that are facing away from node 52 in the x direction only. This, coupled with the discussion above about unused nodes describes why these edges are not utilised by the cars.
+So out of 71 unused edges, 41 of them were facing completely away from node 52. In a similar way we can remove nodes that are facing away from node 52 in the x direction only. 
+
+I print the remaining edges below
+
+\begin{python}
+    print(new_unused[0:10])
+    print(new_unused[10:20])
+    print(new_unused[20:31])
+\end{python}
+
+\begin{figure}[h]
+\caption{list of unused edges that aren't facing completely away from node 52}
+\centering
+\includegraphics[width=1.1\textwidth]{new_unused2}
+\end{figure}
+
+
+
+We note that from the first question where we found the maximum load for all cars over the 200 iterations, it is clear that nodes with maximum load 0 (i.e. node 3, 5, 8 etc) will always appear on this list since they were never visited. However, the real question is \textit{why} they were never visited. \\
+
+If we perform Dijkstra's algorithm on the original weight matrix and find the fastest route form node 13 to 52, we find this:
+
+\begin{python}
+print(Dijkst(12,51,weight_matrix))
+\end{python}
+
+\begin{figure}[h]
+\caption{Dijkstra's algorithm path from 13 to 52 (python indices)}
+\centering
+\includegraphics[width=0.9\textwidth]{normalpath}
+\end{figure}
+
+\begin{figure}[h]
+\caption{Dijkstra's algorithm path from 13 to 52 with constant weight matrix}
+\centering
+\includegraphics[width=0.9\textwidth]{dijkpath}
+\end{figure}
+
+
+
+note that these are the python indices and not the actual node numbers.
+
+If we look at figure 3.8, this means without taking the effect of congestion, the fastest path throughout the city is almost completely at the bottom of the map, by the river. This means that it is unlikely for a car to need to travel through the upper west side of the city, such as through nodes 1,3,5 and 2. The only way the shortest path for a car could include such nodes is if the rest of the city is \textit{so} congested that the shortest path will indeed require these upper left nodes. We can see that edges like [3,2], [8,9] are not optimal for this reason, and are thus unused.
+
+There are lots of edges that although aren't facing in the wrong direction in both the x and y direction, but will obviously never lead to an optimal solution. Such as [57,55] and [56,54]. This is because these nodes have a very small degree, 2 or 3. So if the optimal path runs through them (in the opposite direction), the other direction which tracks backwards will not be part of an optimal solution.
+
+We can also consider the fact that if an edge is used by cars, the inverse of that edge is unlikely to be used again. This makes sense if we consider that 71 edges are unused out of a total of 156 edges (almost 1/2). So if we compare all the edges available to use and the edges unused, we should find a high correlation between pairs of the form [a,b] and [b,a] existing in either set. This is another reason highly used edges like [55,57] and [56,54] are not traversed in the opposite direction, as discussed in the paragraph above.
 
 \item \textbf{What flow pattern do we observe for parameter $\epsilon = 0$?}
 
@@ -785,11 +855,14 @@ Now we find the nodes which increase/decrease the most in peak value.
 \end{python}
 
 \begin{figure}[h]
-\caption{The top 8 nodes which increased the most in peak value, followed by (next line) the top 8 nodes that decreased the most in peak value, all with their peak values.}
+\caption{The top 8 nodes which increased the most in peak value, followed by (next line) the top 8 nodes that decreased the most in peak value, all with their difference in peak values.}
 \centering
 \includegraphics[width=1.1\textwidth]{top8}
 \end{figure}
 
-These elements represents the node number and the difference in maximum load from before to when node 30 is congested.
+These elements represents the node number and the difference in maximum load from before to when node 30 is congested. So for example, node 6 increased its peak value by 5, and node 43 decreased its peak value by 14.
+
+
+
 \end{enumerate}
 \end{document}

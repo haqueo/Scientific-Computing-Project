@@ -4,6 +4,9 @@ import csv
 import sys
 import math as ma
 
+# This import is no longer needed for the last question
+# from solution_accident_occurs import max_index_tracker_no30
+
 
 # ------------------------------------------------------------------------
 # ---------------------    FUNCTIONS USED     ----------------------------
@@ -158,11 +161,59 @@ def extract_data():
             RomeV = np.concatenate((RomeV, [float(row[2])]))
     file.close()
 
+    def away_from_52(edge):
+        """
+        Tells you whether a given edge is pointing completely away from
+        node 52, in both the x and y directions.
+        :param edge: an edge of the form [a,b]
+        :return: boolean whether or not this points to or away from 52
+        """
 
+        # extract data for access to global variables
+        extract_data()
+
+        # the edge is of the form [a,b]
+        a = edge[0]
+        b = edge[1]
+
+        # use RomeX and RomeY to find the coordinates for a,b and node 52.
+        a_coord = [RomeX[a - 1], RomeY[a - 1]]
+        b_coord = [RomeX[b - 1], RomeY[b - 1]]
+        coord52 = [RomeX[51], RomeY[51]]
+
+        # find the change in x/y from a -> b
+        x_change = b_coord[0] - a_coord[0]
+        y_change = b_coord[1] - a_coord[1]
+
+        # find the change in x/y from a -> 52
+        x_changeTo52 = coord52[0] - a_coord[0]
+        y_changeto52 = coord52[1] - a_coord[1]
+
+        # if we're at 52 we're moving away from it
+        if a == 52:
+            return True
+
+        # if both point in same direction, false.
+        if (x_changeTo52 > 0) and (x_change > 0):
+            return False
+        elif (x_changeTo52 < 0) and (x_change < 0):
+            return False
+
+        # if both point in same direction, false.
+        if (y_changeto52 > 0) and (y_change > 0):
+            return False
+        elif (y_changeto52 < 0) and (y_change < 0):
+            return False
+
+        # all other tests have passed, so must be True.
+        return True
     # ----------------------------------------------------------------------
     # ---------------------    Main program     ----------------------------
     # ----------------------------------------------------------------------
 
+# NOTE: All I have done is remove the if __name__ == '__main__': statement
+# so that it is easier to import the max_index_tracker_no30 variable at
+# the end.
 
 # Import the rome edges file
 extract_data()
