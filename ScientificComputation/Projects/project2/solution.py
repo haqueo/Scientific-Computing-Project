@@ -188,17 +188,21 @@ def one_step_at_a_time():
 
 def new_iterative_bell(initial_job_sequence,adjusted_weights):
 
+    # create a copy of the weight matrix
     temp_weights = np.copy(adjusted_weights)
 
     # update weight matrix according to initial job sequence
     temp_weights[node_finish(initial_job_sequence[-2]),initial_job_sequence[-1]] = 1
     temp_weights[26,initial_job_sequence[-1]] = 1
 
-    counter = 0
-    a = initial_job_sequence[-1]
+    # create a set called 'removed'
     Removed = set()
-    Removed.add(a)
+    Removed.add(initial_job_sequence[-1])
+
+    # create the while condition
     condition = True
+
+    
     while(condition):
         full_bellman_path = updated_bellman_ford(26,27,temp_weights) #
 
@@ -223,7 +227,7 @@ def new_iterative_bell(initial_job_sequence,adjusted_weights):
 
 
         print(Removed)
-        if len(Removed) >= 11:
+        if len(Removed) >= 12:
             condition = False
 
 
