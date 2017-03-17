@@ -107,6 +107,7 @@ def updated_bellman_ford(ist, isp, wei):
 
     return shpath[::-1]
 
+
 def iterative_bell():
 
     # initialise data and weight matrix
@@ -185,36 +186,66 @@ def one_step_at_a_time():
     shortest = [0,1,4]
 
 
+def new_iterative_bell(longest_path,data,adjusted_weights):
+
+    # remove the last pair from the adjusted weight matrix
+    # last pair = [a,b]
+
+    #
+    #
+    #
+    # adjusted_weights[node_finish(last_pair[0]),last_pair[1]] = 1
+    #
+    # path2 = updated_bellman_ford(26, 27, adjusted_weights)
+    # longest_path3 = path2[1:len(path) - 1][::2]
+    #
+    # print(longest_path3)
 
 
+    temp_weights = np.copy(adjusted_weights)
+
+
+    for i in range(11):
+        path4 = updated_bellman_ford(26,27,adjusted_weights)
+        longest_path4 = path4[1:len(path4)-1][::2]
+        last_pair = [longest_path4[-2], longest_path4[-1]]
+
+        # remove the last pair from the adjusted_weights
+        adjusted_weights[node_finish(last_pair[0]),last_pair[1]] = 1
+        print(longest_path4)
 
 if __name__ == '__main__':
 
-    # data = generate_connectivity('./data/jobslist')
-    #
-    # weights = generate_weight_matrix(data)
-    #
-    # adjusted_weights = -1 * weights
-    #
-    # path = updated_bellman_ford(26, 27, adjusted_weights)
-    # longest_path = path[1:len(path)-1][::2]
-    #
-    # print(longest_path)
+    data = generate_connectivity('./data/jobslist')
+
+    weights = generate_weight_matrix(data)
+
+    adjusted_weights = -1 * weights
+
+
+
+    path = updated_bellman_ford(26, 27, adjusted_weights)
+    longest_path = path[1:len(path)-1][::2]
+
+
+
+    print(new_iterative_bell(longest_path,data,adjusted_weights))
+
 
     # real question
 
 
-    paths1 = iterative_bell()
-    final_gantt = np.zeros((13,2),dtype=int)
+    # paths1 = iterative_bell()
+    # final_gantt = np.zeros((13,2),dtype=int)
     # print(final_gantt)
 
     # can_move = [i for i in range(13) if i not in completed_before]
     # for subpath in paths1:
     #     if subpath[0] in can_move:
 
-
-    times = [[0,41],[41,92],[0,50],[50,86],[92,130],[21,66],[0,21],[66,98],[0,32],[21,70],[41,71],[70,89],[92,118]]
-    print(times)
+    #
+    # times = [[0,41],[41,92],[0,50],[50,86],[92,130],[21,66],[0,21],[66,98],[0,32],[21,70],[41,71],[70,89],[92,118]]
+    # print(times)
 
     # print(times)
 
