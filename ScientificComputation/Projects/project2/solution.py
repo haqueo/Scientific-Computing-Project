@@ -186,33 +186,48 @@ def one_step_at_a_time():
     shortest = [0,1,4]
 
 
-def new_iterative_bell(longest_path,data,adjusted_weights):
-
-    # remove the last pair from the adjusted weight matrix
-    # last pair = [a,b]
-
-    #
-    #
-    #
-    # adjusted_weights[node_finish(last_pair[0]),last_pair[1]] = 1
-    #
-    # path2 = updated_bellman_ford(26, 27, adjusted_weights)
-    # longest_path3 = path2[1:len(path) - 1][::2]
-    #
-    # print(longest_path3)
-
+def new_iterative_bell(initial_job_sequence,adjusted_weights):
 
     temp_weights = np.copy(adjusted_weights)
 
+    # update weight matrix according to initial job sequence
+    temp_weights[node_finish(initial_job_sequence[-2]),initial_job_sequence[-1]] = 1
+    temp_weights[26,initial_job_sequence[-1]] = 1
 
-    for i in range(11):
-        path4 = updated_bellman_ford(26,27,adjusted_weights)
-        longest_path4 = path4[1:len(path4)-1][::2]
-        last_pair = [longest_path4[-2], longest_path4[-1]]
+    counter = 0
+    a = initial_job_sequence[-1]
+    Removed = set()
+    Removed.add(a)
+    condition = True
+    while(condition):
+        full_bellman_path = updated_bellman_ford(26,27,temp_weights) #
 
-        # remove the last pair from the adjusted_weights
-        adjusted_weights[node_finish(last_pair[0]),last_pair[1]] = 1
-        print(longest_path4)
+        if len(full_bellman_path) > 4:
+
+            job_sequence = full_bellman_path[1:len(full_bellman_path)-1][::2]
+            last_pair = [job_sequence[-2], job_sequence[-1]]
+
+            # remove the last pair from the adjusted_weights
+            temp_weights[node_finish(last_pair[0]),last_pair[1]] = 1
+            # remove the virtual start node going to b
+            temp_weights[26,last_pair[1]] = 1
+            Removed.add(last_pair[1])
+            print(job_sequence)
+
+        else:
+            job_sequence = [full_bellman_path[1]]
+            temp_weights[node_finish(job_sequence[0]),27] = 1
+            temp_weights[26,job_sequence[0]] = 1
+            Removed.add(job_sequence[0])
+            print(job_sequence)
+
+
+        print(Removed)
+        if len(Removed) >= 11:
+            condition = False
+
+
+
 
 if __name__ == '__main__':
 
@@ -229,7 +244,7 @@ if __name__ == '__main__':
 
 
 
-    print(new_iterative_bell(longest_path,data,adjusted_weights))
+    new_iterative_bell(longest_path,adjusted_weights)
 
 
     # real question
