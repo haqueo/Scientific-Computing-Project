@@ -95,7 +95,7 @@ def updated_bellman_ford(ist, isp, wei):
             w = wei[u, v]
             if (w != 0):
                 if (d[u] + w < d[v]):
-                    #print('graph contains a negative-weight cycle')
+                    # print('graph contains a negative-weight cycle')
                     pass
 
     # step 4: determine the shortest path
@@ -109,11 +109,10 @@ def updated_bellman_ford(ist, isp, wei):
 
 
 def iterative_bell():
-
     # initialise data and weight matrix
     data = generate_connectivity('./data/jobslist')
     weights = generate_weight_matrix(data)
-    adjusted_weights = -1*weights
+    adjusted_weights = -1 * weights
 
     # create a copy of weight matrix
     temp_weights = adjusted_weights
@@ -128,31 +127,30 @@ def iterative_bell():
     while len(current_nodes) != 0:
 
         # find the longest path
-        path = updated_bellman_ford(26,27,temp_weights)
-        longest_path = path[1:len(path)-1][::2]
+        path = updated_bellman_ford(26, 27, temp_weights)
+        longest_path = path[1:len(path) - 1][::2]
 
         # add this to the list of longest paths
         list_of_longest_paths.append(longest_path)
 
         for node in longest_path:
-
             # remove every node in the list of longest
             # paths from current_nodes
             current_nodes.remove(node)
 
             # update the weight matrix so no nodes
             # can move to these nodes
-            temp_weights[:,node] = 1
-            temp_weights[:,node] = 1
+            temp_weights[:, node] = 1
+            temp_weights[:, node] = 1
 
     return list_of_longest_paths
 
-def iterative_bell2():
 
+def iterative_bell2():
     # initialise data and weight matrix
     data = generate_connectivity('./data/jobslist')
     weights = generate_weight_matrix(data)
-    adjusted_weights = -1*weights
+    adjusted_weights = -1 * weights
 
     # create a copy of weight matrix
     temp_weights = adjusted_weights
@@ -166,34 +164,34 @@ def iterative_bell2():
         # find the shortest path ie the longest
 
         # find the longest path
-        path = updated_bellman_ford(26,27,temp_weights)
-        longest_path = path[1:len(path)-1][::2]
+        path = updated_bellman_ford(26, 27, temp_weights)
+        longest_path = path[1:len(path) - 1][::2]
         print(longest_path)
         # add this to the list of longest paths
         list_of_longest_paths.append(longest_path)
 
-        for i,node in enumerate(longest_path):
+        for i, node in enumerate(longest_path):
 
             if node in not_reached:
                 not_reached.remove(node)
 
             if node != longest_path[-1]:
-                temp_weights[node_finish(node),longest_path[i+1]] = 1
+                temp_weights[node_finish(node), longest_path[i + 1]] = 1
 
     return list_of_longest_paths
 
+
 def one_step_at_a_time():
-    shortest = [0,1,4]
+    shortest = [0, 1, 4]
 
 
-def new_iterative_bell(initial_job_sequence,adjusted_weights):
-
+def new_iterative_bell(initial_job_sequence, adjusted_weights):
     # create a copy of the weight matrix
     temp_weights = np.copy(adjusted_weights)
 
     # update weight matrix according to initial job sequence
-    temp_weights[node_finish(initial_job_sequence[-2]),initial_job_sequence[-1]] = 1
-    temp_weights[26,initial_job_sequence[-1]] = 1
+    temp_weights[node_finish(initial_job_sequence[-2]), initial_job_sequence[-1]] = 1
+    temp_weights[26, initial_job_sequence[-1]] = 1
 
     # create a set called 'removed'
     Removed = set()
@@ -202,53 +200,46 @@ def new_iterative_bell(initial_job_sequence,adjusted_weights):
     # create the while condition
     condition = True
 
-    
-    while(condition):
-        full_bellman_path = updated_bellman_ford(26,27,temp_weights) #
+    while len(Removed) < 13:
+
+        full_bellman_path = updated_bellman_ford(26, 27, temp_weights)
 
         if len(full_bellman_path) > 4:
 
-            job_sequence = full_bellman_path[1:len(full_bellman_path)-1][::2]
+            job_sequence = full_bellman_path[1:len(full_bellman_path) - 1][::2]
             last_pair = [job_sequence[-2], job_sequence[-1]]
 
             # remove the last pair from the adjusted_weights
-            temp_weights[node_finish(last_pair[0]),last_pair[1]] = 1
+            temp_weights[node_finish(last_pair[0]), last_pair[1]] = 1
             # remove the virtual start node going to b
-            temp_weights[26,last_pair[1]] = 1
+            temp_weights[26, last_pair[1]] = 1
+
+
             Removed.add(last_pair[1])
             print(job_sequence)
 
         else:
+
             job_sequence = [full_bellman_path[1]]
-            temp_weights[node_finish(job_sequence[0]),27] = 1
-            temp_weights[26,job_sequence[0]] = 1
+
+            temp_weights[node_finish(job_sequence[0]), 27] = 1
+            temp_weights[26, job_sequence[0]] = 1
+
             Removed.add(job_sequence[0])
             print(job_sequence)
 
 
-        print(Removed)
-        if len(Removed) >= 12:
-            condition = False
-
-
-
-
 if __name__ == '__main__':
-
     data = generate_connectivity('./data/jobslist')
 
     weights = generate_weight_matrix(data)
 
     adjusted_weights = -1 * weights
 
-
-
     path = updated_bellman_ford(26, 27, adjusted_weights)
-    longest_path = path[1:len(path)-1][::2]
+    longest_path = path[1:len(path) - 1][::2]
 
-
-
-    new_iterative_bell(longest_path,adjusted_weights)
+    new_iterative_bell(longest_path, adjusted_weights)
 
 
     # real question
@@ -277,5 +268,3 @@ if __name__ == '__main__':
     # try 2
 
     # print(iterative_bell2())
-
-
