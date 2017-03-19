@@ -184,6 +184,19 @@ def iterative_bell2():
 def one_step_at_a_time():
     shortest = [0, 1, 4]
 
+def start_stop_times(job_sequence_iter,start_stop_array,edge_values):
+
+    earliest_start2 = 0
+
+    for node in job_sequence_iter:
+
+        earliest_end2 = edge_values[node] + earliest_start2
+
+        start_stop[node, 0] = max(start_stop_array[node, 0], earliest_start2)
+        start_stop[node, 1] = max(start_stop_array[node, 1], earliest_end2)
+
+        earliest_start2 = earliest_end2
+
 
 def new_iterative_bell(initial_job_sequence, adjusted_weights):
     # create a copy of the weight matrix
@@ -199,6 +212,8 @@ def new_iterative_bell(initial_job_sequence, adjusted_weights):
 
     # create the while condition
     condition = True
+
+    edge_values = data[:,1]
 
     while len(Removed) < 13:
 
@@ -220,9 +235,12 @@ def new_iterative_bell(initial_job_sequence, adjusted_weights):
         temp_weights[26, last_pair[1]] = 1
 
         print(job_sequence)
+        #update start_stop_times
+        start_stop_times(job_sequence_iter=job_sequence,start_stop_array=start_stop,edge_values=edge_values)
 
 
 if __name__ == '__main__':
+
     data = generate_connectivity('./data/jobslist')
 
     weights = generate_weight_matrix(data)
@@ -230,34 +248,28 @@ if __name__ == '__main__':
     adjusted_weights = -1 * weights
 
     path = updated_bellman_ford(26, 27, adjusted_weights)
-    longest_path = path[1:len(path) - 1][::2]
+    longest_path = path[1:-1:2]
+
+    earliest_start = 0
+    earliest_end = 0
+
+    start_stop = np.zeros((13, 2), dtype=int)
+
+    # we can already fill up the start_stop matrix.
+    for node in longest_path:
+        earliest_end = data[:,1][node] + earliest_start
+
+        start_stop[node,0] = max(start_stop[node,0],earliest_start)
+        start_stop[node,1] = max(start_stop[node,1],earliest_end)
+
+        earliest_start = earliest_end
+
+
 
     new_iterative_bell(longest_path, adjusted_weights)
 
 
-    # real question
-
-
-    # paths1 = iterative_bell()
-    # final_gantt = np.zeros((13,2),dtype=int)
-    # print(final_gantt)
-
-    # can_move = [i for i in range(13) if i not in completed_before]
-    # for subpath in paths1:
-    #     if subpath[0] in can_move:
-
-    #
-    # times = [[0,41],[41,92],[0,50],[50,86],[92,130],[21,66],[0,21],[66,98],[0,32],[21,70],[41,71],[70,89],[92,118]]
-    # print(times)
-
-    # print(times)
-
-
-    # print(completed_before)
+    print(start_stop)
 
 
 
-
-    # try 2
-
-    # print(iterative_bell2())
