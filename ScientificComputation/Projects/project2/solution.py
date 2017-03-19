@@ -203,30 +203,23 @@ def new_iterative_bell(initial_job_sequence, adjusted_weights):
     while len(Removed) < 13:
 
         full_bellman_path = updated_bellman_ford(26, 27, temp_weights)
+        # print("full_bellman_path is %s" % str(full_bellman_path))
 
-        if len(full_bellman_path) > 4:
+        job_sequence = full_bellman_path[1:-1:2]
 
-            job_sequence = full_bellman_path[1:len(full_bellman_path) - 1][::2]
-            last_pair = [job_sequence[-2], job_sequence[-1]]
-
-            # remove the last pair from the adjusted_weights
-            temp_weights[node_finish(last_pair[0]), last_pair[1]] = 1
-            # remove the virtual start node going to b
-            temp_weights[26, last_pair[1]] = 1
-
-
-            Removed.add(last_pair[1])
-            print(job_sequence)
-
+        if len(job_sequence) == 1:
+            last_pair = [job_sequence[0], 27]
+            Removed.add(last_pair[0])
         else:
+            last_pair = [job_sequence[-2], job_sequence[-1]]
+            Removed.add(last_pair[1])
 
-            job_sequence = [full_bellman_path[1]]
+        # remove the last pair from the adjusted_weights
+        temp_weights[node_finish(last_pair[0]), last_pair[1]] = 1
+        # remove the virtual start node going to b
+        temp_weights[26, last_pair[1]] = 1
 
-            temp_weights[node_finish(job_sequence[0]), 27] = 1
-            temp_weights[26, job_sequence[0]] = 1
-
-            Removed.add(job_sequence[0])
-            print(job_sequence)
+        print(job_sequence)
 
 
 if __name__ == '__main__':
