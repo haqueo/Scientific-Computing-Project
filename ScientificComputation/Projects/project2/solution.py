@@ -22,12 +22,12 @@ def generate_weight_matrix(data):
         for job in jobs:
             weight_matrix[node_finish(node_start), job] = 0
 
-    ## virtual start = 26
-    ## virtual finish = 27
-    ## nodes = 13
+    virtual_start = int(weight_matrix.shape[0]) - 2
+    virtual_finish = int(weight_matrix.shape[0]) - 1
+    no_nodes = (int(weight_matrix.shape[0])-2)/2
 
-    weight_matrix[26, 0:13] = 0
-    weight_matrix[13:26, 27] = 0
+    weight_matrix[virtual_start, 0:no_nodes] = 0
+    weight_matrix[no_nodes:virtual_start, virtual_finish] = 0
 
     return weight_matrix
 
@@ -57,9 +57,9 @@ def generate_connectivity(file_name):
 
     file.close()
 
-    dataframe = np.column_stack((job, duration, completed_before))
+    data_frame = np.column_stack((job, duration, completed_before))
 
-    return dataframe
+    return data_frame
 
 
 def updated_bellman_ford(ist, isp, wei):
