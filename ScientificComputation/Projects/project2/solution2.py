@@ -108,18 +108,6 @@ def updated_bellman_ford(ist, isp, wei):
     return shpath[::-1]
 
 
-def start_stop_times(job_sequence_iter, start_stop_array, edge_values):
-    earliest_start = 0
-
-    for node in job_sequence_iter:
-        earliest_end = edge_values[node] + earliest_start
-
-        start_stop[node, 0] = max(start_stop_array[node, 0], earliest_start)
-        start_stop[node, 1] = max(start_stop_array[node, 1], earliest_end)
-
-        earliest_start = earliest_end
-
-
 def iterative_bell(adjusted_weights, edge_values):
     # create a copy of the weight matrix
     temp_weights = np.copy(adjusted_weights)
@@ -140,7 +128,7 @@ def iterative_bell(adjusted_weights, edge_values):
 
         current_time = 0  # O(1)
 
-        for i, job in enumerate(job_sequence):  # O(k)
+        for job in job_sequence:  # O(k)
 
             if not removed_nodes[job]:  # O(1)
 
@@ -155,12 +143,50 @@ def iterative_bell(adjusted_weights, edge_values):
 
         print(job_sequence)
 
-        # update start_stop_times
-        # start_stop_times(job_sequence_iter=job_sequence,
-        # start_stop_array=start_stop, edge_values=edge_values)
+
+def find_threads(start_stop_times):
+
+    threads = [[0,1,4]]
+    current_thread = []
+    start_stop2 = np.column_stack((start_stop_times, range(13)))
+
+    while len(start_stop2) != 0:
+
+        condition = True
+
+        while(condition):
+            # start new thread
+
+            current = 0
+
+            # 1.) find possible paths
+            possible_nodes = sorted(start_stop2[current >= start_stop2[:,0]],
+                                    key=lambda x: (x[0],-x[1]))
+
+            possible_nodes4 = np.reshape(possible_nodes,(len(possible_nodes),3))
+
+            real_possible_nodes = possible_nodes4[data[:,1]
+                                                  [possible_nodes4[:,2]] + current <= 130]
+
+            # 2.) if there exists one such that x[0] + current <= 130:
+            if len(real_possible_nodes) != 0:
+                # add to current thread
+                current_thread.append(real_possible_nodes[0,2])
+                # remove from start_stop_times_dict
+                start_stop2.remove(start_stop_times[real_possible_nodes[0,2]])
+                # update current
+                current += data[real_possible_nodes[0,2],1]
+            else:
+                # this thread is over. start a new one.
+                threads.append(current_thread)
+                current_thread = []
+                condition = False
+
+
 
 
 if __name__ == '__main__':
+
     data = generate_connectivity('./data/jobslist')
 
     weights = generate_weight_matrix(data)
@@ -177,5 +203,28 @@ if __name__ == '__main__':
 
     stop_times = [data[:, 1][i] + start_times[i] for i in range(13)]
 
-    start_stop = zip(start_times, stop_times)
+    start_stop = np.column_stack((start_times, stop_times))
+
     print(start_stop)
+
+    ######################################################################
+
+    #find_threads(start_stop)
+
+    print('\n')
+    start_stop2 = np.column_stack((start_stop, range(13)))
+    print(start_stop2)
+    print('\n')
+    possible_nodes = sorted(start_stop2[0 >= start_stop2[:, 0]], key=lambda x: (x[0], -x[1]))
+    print(possible_nodes)
+
+
+    possible_nodes3 = np.reshape(possible_nodes,(4,3))
+
+    print(possible_nodes3)
+    print(data[:, 1][possible_nodes3[-1][2]])
+
+    REAL_possible = possible_nodes3[data[:,1][possible_nodes3[:,2]] + 50 <= 130]
+    print(REAL_possible)
+    # possible_nodes2 = possible_nodes[data[:,1][possible_nodes[:][2]] + 0 <= 130]
+    # print(possible_nodes2)
