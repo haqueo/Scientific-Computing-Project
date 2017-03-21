@@ -121,7 +121,7 @@ def iterative_bell(adjusted_weights, edge_values):
     while counter < 13:  # O(1)
 
         job_sequence = updated_bellman_ford(26, 27, temp_weights)[1:-1:2]  # O(13*E) # all we can change is E
-
+        print(job_sequence)
         # we write k = len(job_sequence)
 
         temp_weights[[node + 13 for node in job_sequence], 27] = 1  # O(k)
@@ -141,39 +141,77 @@ def iterative_bell(adjusted_weights, edge_values):
 
         removed_nodes[job_sequence] = True  # O(1)
 
-        print(job_sequence)
+
+def index_of(row, matrix):
+    """find the first occurence of a row in a matrix"""
+
+    for i,g_row in enumerate(matrix):
+        if np.array_equal(row,g_row):
+            return i
+
+    return -1
 
 
-def find_threads(start_stop_times):
+def find_threads(start_stop_adjusted_input):
+
+    start_stop_vector = np.copy(start_stop_adjusted_input)
 
     threads = [[0,1,4]]
-    current_thread = []
-    start_stop2 = np.column_stack((start_stop_times, range(13)))
 
-    while len(start_stop2) != 0:
+    current_thread = []
+
+    while len(start_stop_vector) != 0:
+
+        # start a new thread
 
         condition = True
+        current = 0
 
         while(condition):
-            # start new thread
 
-            current = 0
+            condition1 = np.asarray([current >= start_stop_adjusted[:, 0]])
+            condition2 = np.asarray([start_stop_adjusted[:, 1] - start_stop_adjusted[:, 0] <= 130 - current])
 
-            # 1.) find possible paths
-            possible_nodes = sorted(start_stop2[current >= start_stop2[:,0]],
-                                    key=lambda x: (x[0],-x[1]))
+            possible_jobs = start_stop_vector[condition1[0] & condition2[0],2]
 
-            possible_nodes4 = np.reshape(possible_nodes,(len(possible_nodes),3))
+            if len(possible_jobs)!=0:
 
-            real_possible_nodes = possible_nodes4[data[:,1]
-                                                  [possible_nodes4[:,2]] + current <= 130]
+                # find the job which minimises current - earlieststart of job
+                time_differences = np.abs(start_stop_adjusted[possible_jobs, 0]-current)
+                argmin = possible_jobs[np.argmax(time_differences)]
+
+                # there may be jobs equally distant.. we need to choose the longest one
+                equally_distant = possible_jobs[po]
+
+                current_thread.append(argmin)
+
+                ##hard bit - delete it from start_stop
+
+            else:
+                threads.append(current_thread)
+                current_thread = []
+                condition = False
+
+
+
+            real_possible_nodes = possible_nodes4[data[:,1][possible_nodes4[:,2]] <= 130-current]
 
             # 2.) if there exists one such that x[0] + current <= 130:
             if len(real_possible_nodes) != 0:
                 # add to current thread
                 current_thread.append(real_possible_nodes[0,2])
                 # remove from start_stop_times_dict
-                start_stop2.remove(start_stop_times[real_possible_nodes[0,2]])
+                # index = np.argmax(,axis=9)
+                # print(index)
+
+                index = index_of(real_possible_nodes[0],start_stop_vector)
+                print(start_stop_vector)
+                print(real_possible_nodes[0])
+                print(index)
+                print('current is %i' % current)
+
+                start_stop_vector = np.delete(start_stop_vector,index,0)
+                # start_stop2.remove(start_stop_times[real_possible_nodes[0,2]])
                 # update current
                 current += data[real_possible_nodes[0,2],1]
             else:
@@ -181,6 +219,13 @@ def find_threads(start_stop_times):
                 threads.append(current_thread)
                 current_thread = []
                 condition = False
+
+        print("THE THREADS ARE")
+        print(threads)
+        break
+    # print(threads)
+
+
 
 
 
@@ -205,26 +250,48 @@ if __name__ == '__main__':
 
     start_stop = np.column_stack((start_times, stop_times))
 
-    print(start_stop)
+    # print(start_stop)
 
     ######################################################################
 
-    #find_threads(start_stop)
-
-    print('\n')
     start_stop2 = np.column_stack((start_stop, range(13)))
-    print(start_stop2)
-    print('\n')
-    possible_nodes = sorted(start_stop2[0 >= start_stop2[:, 0]], key=lambda x: (x[0], -x[1]))
+
+    start_stop_adjusted = np.delete(start_stop2,[0,1,4],axis=0)
+
+    # find_threads(start_stop_adjusted)
+
+    current = 0
+    condition1 = np.asarray([current >= start_stop_adjusted[:, 0]])
+    condition2 = np.asarray([start_stop_adjusted[:,0] - start_stop_adjusted[:,1] <= 130 - current])
+
+    # print(type(condition1[0]))
+
+    possible_nodes = start_stop_adjusted[condition1[0] & condition2[0],2]
+
     print(possible_nodes)
 
+    possible_weights = data[possible_nodes, 1] - current
+    print("possible_weights is ")
+    print(possible_weights)
+    minus_possible_weights = np.abs(data[possible_nodes, 1] - current)
+    argmin = np.argmax(minus_possible_weights)
+    print(argmin)
 
-    possible_nodes3 = np.reshape(possible_nodes,(4,3))
-
-    print(possible_nodes3)
-    print(data[:, 1][possible_nodes3[-1][2]])
-
-    REAL_possible = possible_nodes3[data[:,1][possible_nodes3[:,2]] + 50 <= 130]
-    print(REAL_possible)
-    # possible_nodes2 = possible_nodes[data[:,1][possible_nodes[:][2]] + 0 <= 130]
-    # print(possible_nodes2)
+    #
+    # print('\n')
+    # start_stop2 = np.column_stack((start_stop, range(13)))
+    # print(start_stop2)
+    # print('\n')
+    # possible_nodes = sorted(start_stop2[0 >= start_stop2[:, 0]], key=lambda x: (x[0], -x[1]))
+    # print(possible_nodes)
+    #
+    #
+    # possible_nodes3 = np.reshape(possible_nodes,(4,3))
+    #
+    # print(possible_nodes3)
+    # print(data[:, 1][possible_nodes3[-1][2]])
+    #
+    # REAL_possible = possible_nodes3[data[:,1][possible_nodes3[:,2]] + 50 <= 130]
+    # print(REAL_possible)
+    # # possible_nodes2 = possible_nodes[data[:,1][possible_nodes[:][2]] + 0 <= 130]
+    # # print(possible_nodes2)
