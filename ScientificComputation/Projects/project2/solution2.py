@@ -24,7 +24,7 @@ def generate_weight_matrix(data):
 
     virtual_start = int(weight_matrix.shape[0]) - 2
     virtual_finish = int(weight_matrix.shape[0]) - 1
-    no_nodes = (int(weight_matrix.shape[0])-2)/2
+    no_nodes = (int(weight_matrix.shape[0]) - 2) / 2
 
     weight_matrix[virtual_start, 0:no_nodes] = 0
     weight_matrix[no_nodes:virtual_start, virtual_finish] = 0
@@ -109,11 +109,9 @@ def updated_bellman_ford(ist, isp, wei):
 
 
 def start_stop_times(job_sequence_iter, start_stop_array, edge_values):
-
     earliest_start = 0
 
     for node in job_sequence_iter:
-
         earliest_end = edge_values[node] + earliest_start
 
         start_stop[node, 0] = max(start_stop_array[node, 0], earliest_start)
@@ -123,56 +121,61 @@ def start_stop_times(job_sequence_iter, start_stop_array, edge_values):
 
 
 def iterative_bell(adjusted_weights, edge_values):
-
     # create a copy of the weight matrix
     temp_weights = np.copy(adjusted_weights)
 
-    # create a set called 'removed'
-    # this will contain the nodes which we have removed connections with from
-    #  the virtual start node. When the size of this set reaches 13, we know
-    # we have covered all paths in the network
-    removed_nodes = set()
+    # This is a list of 13 Falses
+    # If a node appears in a job sequence (i.e. we know its start time)
+    # it turns to true.
+    removed_nodes = np.zeros(13, dtype=bool)
+    counter = 0
 
-    while len(removed_nodes) < 13:
+    while counter < 13:  # O(1)
 
-        full_bellman_path = updated_bellman_ford(26, 27, temp_weights)
-        # print("full_bellman_path is %s" % str(full_bellman_path))
+        job_sequence = updated_bellman_ford(26, 27, temp_weights)[1:-1:2]  # O(13*E) # all we can change is E
 
-        job_sequence = full_bellman_path[1:-1:2]
+        # we write k = len(job_sequence)
 
-        if len(job_sequence) > 1:
-            last_pair = [job_sequence[-2], job_sequence[-1]]
-            removed_nodes.add(last_pair[1])
-        else:
-            last_pair = [job_sequence[0], 27]
-            removed_nodes.add(last_pair[0])
+        temp_weights[[node + 13 for node in job_sequence], 27] = 1  # O(k)
 
-        # remove the last pair from the adjusted_weights
-        temp_weights[node_finish(last_pair[0]), last_pair[1]] = 1
-        # remove the virtual start node going to b
-        temp_weights[26, last_pair[1]] = 1
+        current_time = 0  # O(1)
+
+        for i, job in enumerate(job_sequence):  # O(k)
+
+            if not removed_nodes[job]:  # O(1)
+
+                start_times[job] = current_time  # O(1)
+                counter += 1  # O(1)
+
+            current_time += edge_values[job]  # O(1)
+
+        # so the for loop is O(k) in total
+
+        removed_nodes[job_sequence] = True  # O(1)
 
         print(job_sequence)
 
         # update start_stop_times
-        start_stop_times(job_sequence_iter=job_sequence,
-                         start_stop_array=start_stop, edge_values=edge_values)
+        # start_stop_times(job_sequence_iter=job_sequence,
+        # start_stop_array=start_stop, edge_values=edge_values)
 
 
 if __name__ == '__main__':
-
     data = generate_connectivity('./data/jobslist')
 
     weights = generate_weight_matrix(data)
 
     adjusted_weights = -1 * weights
 
-    path = updated_bellman_ford(26, 27, adjusted_weights)
-    longest_path = path[1:-1:2]
+    longest_path = updated_bellman_ford(26, 27, adjusted_weights)[1:-1:2]
 
-    start_stop = np.zeros((13, 2), dtype=int)
+    #######################################################################
+
+    start_times = np.zeros(13, dtype=int)
 
     iterative_bell(adjusted_weights, data[:, 1])
 
+    stop_times = [data[:, 1][i] + start_times[i] for i in range(13)]
+
+    start_stop = zip(start_times, stop_times)
     print(start_stop)
-    print(data[:,1])
