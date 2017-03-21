@@ -176,16 +176,37 @@ def find_threads(start_stop_adjusted_input):
 
             if len(possible_jobs)!=0:
 
-                # find the job which minimises current - earlieststart of job
-                time_differences = np.abs(start_stop_adjusted[possible_jobs, 0]-current)
-                argmin = possible_jobs[np.argmax(time_differences)]
+                # find the job which minimises abs(current - earliest_start of job)
+                # or equivalently, maximises -1 * abs(current - earliest_start of job)
 
-                # there may be jobs equally distant.. we need to choose the longest one
-                equally_distant = possible_jobs[po]
+                # there may be many possible jobs equally distant.. we need to choose the longest one
+                current_max = 0
+                current_length = 0
 
-                current_thread.append(argmin)
+                for job in possible_jobs:
 
-                ##hard bit - delete it from start_stop
+                    time_difference = -1*np.abs(start_stop_adjusted[job,0] - current)
+
+                    if (time_difference >= current_max) and (start_stop_vector[job,1] - start_stop_vector[job,0] >= current_length):
+
+                        current_max = time_difference
+                        current_length = start_stop_vector[job,1] - start_stop_vector[job,0]
+                        minimising_job = job
+
+
+
+                # we now have the job that is closest to current, and also with the longest job time.
+
+                # add this job to current thread
+                current_thread.append(minimising_job)
+
+                # update current
+                current += start_stop_vector[minimising_job,1] - start_stop_vector[minimising_job,0]
+
+                # hard bit - delete it from start_stop
+                start_stop_vector[minimising_job,0] = 10000
+                start_stop_vector[minimising_job,1] = 20000
+
 
             else:
                 threads.append(current_thread)
@@ -256,7 +277,11 @@ if __name__ == '__main__':
 
     start_stop2 = np.column_stack((start_stop, range(13)))
 
-    start_stop_adjusted = np.delete(start_stop2,[0,1,4],axis=0)
+    start_stop2_copy = np.copy(start_stop2)
+    start_stop2_copy[[0,1,4],0] = 10000 # this effectively means deletion
+    start_stop2_copy[[0,1,4],1] = 20000 # this effectively means deletion
+    print(start_stop2_copy)
+    start_stop_adjusted = start_stop2_copy
 
     # find_threads(start_stop_adjusted)
 
@@ -266,16 +291,21 @@ if __name__ == '__main__':
 
     # print(type(condition1[0]))
 
-    possible_nodes = start_stop_adjusted[condition1[0] & condition2[0],2]
+    possible_jobs = start_stop_adjusted[condition1[0] & condition2[0],2]
+    print('\n')
+    print(possible_jobs)
+    print(start_stop_adjusted)
 
-    print(possible_nodes)
+    time_differences = -1 * np.abs(start_stop_adjusted[possible_jobs, 0] - current)
+    print(time_differences)
 
-    possible_weights = data[possible_nodes, 1] - current
-    print("possible_weights is ")
-    print(possible_weights)
-    minus_possible_weights = np.abs(data[possible_nodes, 1] - current)
-    argmin = np.argmax(minus_possible_weights)
-    print(argmin)
+    # possible_weights = data[possible_nodes, 1] - current
+    # print("possible_weights is ")
+    # print(possible_weights)
+    # minus_possible_weights = np.abs(data[possible_nodes, 1] - current)
+    # argmin = np.argmax(minus_possible_weights)
+    # print(argmin)
+    #
 
     #
     # print('\n')
