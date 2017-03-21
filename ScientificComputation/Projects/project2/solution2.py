@@ -142,21 +142,10 @@ def iterative_bell(adjusted_weights, edge_values):
         removed_nodes[job_sequence] = True  # O(1)
 
 
-def index_of(row, matrix):
-    """find the first occurence of a row in a matrix"""
-
-    for i,g_row in enumerate(matrix):
-        if np.array_equal(row,g_row):
-            return i
-
-    return -1
-
-
 def find_threads(start_stop_adjusted_input):
-
     start_stop_vector = np.copy(start_stop_adjusted_input)
 
-    threads = [[0,1,4]]
+    threads = [[0, 1, 4]]
 
     current_thread = []
 
@@ -172,16 +161,15 @@ def find_threads(start_stop_adjusted_input):
         condition = True
         current = 0
 
-
-        while(condition):
+        while condition:
 
             condition1 = np.asarray([current >= start_stop_vector[:, 0]])
             condition2 = np.asarray([start_stop_vector[:, 1] - start_stop_vector[:, 0] <= 130 - current])
 
-            possible_jobs = start_stop_vector[condition1[0] & condition2[0],2]
-            print('possible jobs are %s' % str(possible_jobs))
-            print('current is %i' % current)
-            if len(possible_jobs)!=0:
+            possible_jobs = start_stop_vector[condition1[0] & condition2[0], 2]
+
+
+            if len(possible_jobs) != 0:
 
                 # find the job which minimises abs(current - earliest_start of job)
                 # or equivalently, maximises -1 * abs(current - earliest_start of job)
@@ -192,15 +180,15 @@ def find_threads(start_stop_adjusted_input):
 
                 for job in possible_jobs:
                     if job not in current_thread:
-                        time_difference = -1*np.abs(start_stop_vector[job,0] - current)
+                        time_difference = -1 * np.abs(start_stop_vector[job, 0] - current)
 
-                        if (time_difference >= current_max) and (start_stop_vector[job,1] - start_stop_vector[job,0] >= current_length):
-
+                        if (time_difference >= current_max) and (
+                                        start_stop_vector[job, 1] - start_stop_vector[job, 0] >= current_length):
                             current_max = time_difference
-                            current_length = start_stop_vector[job,1] - start_stop_vector[job,0]
+                            current_length = start_stop_vector[job, 1] - start_stop_vector[job, 0]
                             minimising_job = job
 
-                print('minimising job is %i' % minimising_job)
+
 
                 # we now have the job that is closest to current, and also with the longest job time.
 
@@ -208,30 +196,23 @@ def find_threads(start_stop_adjusted_input):
                 current_thread.append(minimising_job)
                 jobs_to_do.remove(minimising_job)
                 # update current
-                current += start_stop_vector[minimising_job,1] - start_stop_vector[minimising_job,0]
+                current += start_stop_vector[minimising_job, 1] - start_stop_vector[minimising_job, 0]
 
                 # hard bit - delete it from start_stop
-                start_stop_vector[minimising_job,0] = 10000
-                start_stop_vector[minimising_job,1] = 20000
+                start_stop_vector[minimising_job, 0] = 10000
+                start_stop_vector[minimising_job, 1] = 20000
 
 
             else:
-                print('jobs_to_do is %s' % str(jobs_to_do))
-                if (len(start_stop_vector[condition1[0],2]) == 0) and (len(jobs_to_do)!=0):
-                    current +=10
+
+                if (len(start_stop_vector[condition1[0], 2]) == 0) and (len(jobs_to_do) != 0):
+                    current += 10
                 else:
                     threads.append(current_thread)
                     current_thread = []
                     condition = False
 
-        print("THE THREADS ARE")
-        print(threads)
-
-    # print(threads)
-
-
-
-
+    return threads
 
 
 if __name__ == '__main__':
@@ -254,56 +235,9 @@ if __name__ == '__main__':
 
     start_stop = np.column_stack((start_times, stop_times))
 
-    # print(start_stop)
-
     ######################################################################
 
     start_stop2 = np.column_stack((start_stop, range(13)))
-
-    start_stop2_copy = np.copy(start_stop2)
-    start_stop2_copy[[0,1,4],0] = 10000 # this effectively means deletion
-    start_stop2_copy[[0,1,4],1] = 20000 # this effectively means deletion
-
-
-    start_stop_adjusted = start_stop2_copy
-
-    find_threads(start_stop_adjusted)
-
-    current = 0
-    condition1 = np.asarray([current >= start_stop_adjusted[:, 0]])
-    condition2 = np.asarray([start_stop_adjusted[:,0] - start_stop_adjusted[:,1] <= 130 - current])
-
-    # print(type(condition1[0]))
-
-    possible_jobs = start_stop_adjusted[condition1[0] & condition2[0],2]
-
-
-    time_differences = -1 * np.abs(start_stop_adjusted[possible_jobs, 0] - current)
-
-
-    # possible_weights = data[possible_nodes, 1] - current
-    # print("possible_weights is ")
-    # print(possible_weights)
-    # minus_possible_weights = np.abs(data[possible_nodes, 1] - current)
-    # argmin = np.argmax(minus_possible_weights)
-    # print(argmin)
-    #
-
-    #
-    # print('\n')
-    # start_stop2 = np.column_stack((start_stop, range(13)))
-    # print(start_stop2)
-    # print('\n')
-    # possible_nodes = sorted(start_stop2[0 >= start_stop2[:, 0]], key=lambda x: (x[0], -x[1]))
-    # print(possible_nodes)
-    #
-    #
-    # possible_nodes3 = np.reshape(possible_nodes,(4,3))
-    #
-    # print(possible_nodes3)
-    # print(data[:, 1][possible_nodes3[-1][2]])
-    #
-    # REAL_possible = possible_nodes3[data[:,1][possible_nodes3[:,2]] + 50 <= 130]
-    # print(REAL_possible)
-    # # possible_nodes2 = possible_nodes[data[:,1][possible_nodes[:][2]] + 0 <= 130]
-    # # print(possible_nodes2)
+    start_stop2[[0, 1, 4], 0] = 10000  # this effectively means deletion
+    start_stop2[[0, 1, 4], 1] = 20000  # this effectively means deletion
+    print(find_threads(start_stop2))
