@@ -129,35 +129,50 @@ In order to make this program as robust and as general as possible, I have writt
 The function \textit{extract\_data} uses the csv module to iterate through every row of the datafile, and combine them into a numpy array.
 
 \begin{python} 
+import csv
+import numpy as np
+import sys
+
+
 def extract_data(file_name):
-    global completed_before, duration
+    """
+    This function uses the csv module to extract the 'jobs', 'durations'
+    and 'has to be completed before' columns
+
+    :param file_name: a csv file containing the data
+    :return: a total_nodesx3 np.array containing the 'jobs', 'durations'
+    and 'has to be completed before' columns
+    """
     # e.g. file_name = './data/jobslist'
     job = []
     duration = []
     completed_before = []
 
+    # open the file
     with open(file_name, 'r') as file:
 
         AAA = csv.reader(file)
-
+        # iterate through each row
         for i, row in enumerate(AAA):
-
+            # add the job number
             job.append(int(row[0]))
-
+            # add the duration
             duration.append(int(row[1]))
-
+            # if there are jobs to be completed before, add them
             if len(row) > 2:
                 completed_before.append([int(node) for node in row[2:]])
 
             else:
+                # else add an empty list. 
                 completed_before.append([])
 
     file.close()
 
+    # combine these together
     data_frame = np.column_stack((job, duration, completed_before))
 
     return data_frame
-\end{python}
+    \end{python}
 
 \begin{figure}[h]
 \caption{np.array produced from extract\_data}
@@ -167,8 +182,6 @@ def extract_data(file_name):
 
 \subsection{Constructing the graph}
 We now construct the directed graph, as described in steps \textbf{1,2,3} and \textbf{4} of algorithm 1.1 in the question. For job $m \in \{ 0,1,\dots, 12 \}$ I write $m_{s}$ and $m_{f}$ to mean the start and finish node for job m respectively. I also write $v_{s}$ and $v_{f}$ to mean the virtual start and virtual finish node respectively.
-
-
 
 I will construct an adjacency matrix, $W = \{ w_{i,j} \}$, where $w_{i,j}$ denotes the edge weight between node $i$ and node $j$. The ordering of the matrix rows and columns is the following sequence $$ 0_{s} 1_{s} \dots 12_{s} 0_{f} 1_{f} \dots 12_{f} v_{s} v_{f}$$
 The weights $w_{i,j}$ are specified by steps \textbf{1,2,3} and \textbf{4} of algorithm 1.1, I write the conditions here. $\forall$ jobs m,n $\in \{ 0,1,\dots 12\}$:
@@ -181,7 +194,76 @@ The weights $w_{i,j}$ are specified by steps \textbf{1,2,3} and \textbf{4} of al
 
 Else, we take a value of $w_{i,j} = -1$ if node $i$ is not connected to node $j$. 
 
+Here is the python implementation:
+
+\begin{python}
+def generate_weight_matrix(data):
+    """
+    This function uses the data to create an adjacency matrix, based
+    on the rules outlined.
+
+    :param data: three column np.array with 'jobs', 'durations'
+    and 'has to be completed before' columns
+    :return: the adjacency matrix for this graph
+    """
+    global total_nodes, virtual_start, virtual_finish
+    # we start with an array of -1s and populate the entries that
+    # correspond to connected nodes.
+    total_nodes = data.shape[0]
+    weight_matrix = -1 * np.ones((2 * total_nodes + 2, 2 * total_nodes + 2)
+                                 , dtype=int)
+
+    # node start is the index of start jobs
+    node_start = data[:, 0].astype(int)
+    # job_duration are the job durations for each job
+    job_duration = data[:, 1].astype(int)
+
+    # joining each node start to node finish, with the weight as that job's
+    # duration.
+    weight_matrix[node_start, node_start + 13] = job_duration
+
+    # note on efficiency: I could perhaps do the following for
+    # loop by flattening the data[:,2] column, but I need to
+    # create a list of node_start corresponding to the number of
+    # jobs that each job depends on. This is O(N) anyway, so doing
+    # this via a for loop isn't slower.
+
+    # note: also, python doesn't like slicing like a[0,[[4,5],[1,2,3]]]
+
+    for row in data:
+        jobs2 = row[2]
+        node_start2 = row[0]
+        for job in jobs2:
+            # this is the connections of dependent jobs
+            weight_matrix[node_start2 + 13, job] = 0
+
+    # these are the indices for virtual start and finish
+    virtual_start = int(weight_matrix.shape[0]) - 2
+    virtual_finish = int(weight_matrix.shape[0]) - 1
+
+    # allow movement between virtual start and all the nodes
+    weight_matrix[virtual_start, 0:total_nodes] = 0
+    # allow movement from all the nodes to virtual finish
+    weight_matrix[total_nodes:virtual_start, virtual_finish] = 0
+
+    return weight_matrix
+\end{python}
+
+Running this with the data gives us our adjacency matrix, $W$.
+
 \subsection{Finding the longest path}
+
+We wish to determine the longest path from virtual start to virtual finish. Clearly, the longest path in $W$ is the shortest path in $A:=-W$, where $A = \{a_{i,j} \}$. If we look at the definition of W in section 1.2, we see that node $i$ is connected to node $j$ $\iff$ $w_{i,j} \geq 0 \iff a_{i,j} \leq 0$, since $w_{i,j} = -a_{i,j}$. Similarly, node $i$ is not connected to node $j \iff w_{i,j} = -1 \iff a_{i,j} = 1$. \\
+Therefore to find the shortest path in A from $v_{s}$ to $v_{f}$ we can apply the Bellman Ford algorithm (since we have negative weights), with the modification that instead of a weight of 0 implying two nodes are not connected, we use 1 instead. I outline these changes below:
+
+\begin{figure}[h]
+\caption{changes to the Bellman Ford algorithm}
+\centering
+\includegraphics{changes}
+\end{figure}
+
+Otherwise, the code is the same as from tutorials, so I will not include it in full here.
+
 \subsection{Finding the earliest start and stop times}
 \subsection{Producing the Gantt chart}
 \section{Main Solution Code}

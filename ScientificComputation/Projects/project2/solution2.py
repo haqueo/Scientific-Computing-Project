@@ -2,6 +2,49 @@ import csv
 import numpy as np
 import sys
 
+
+def extract_data(file_name):
+    """
+    This function uses the csv module to extract the 'jobs', 'durations'
+    and 'has to be completed before' columns
+
+    :param file_name: a csv file containing the data
+    :return: a total_nodesx3 np.array containing the 'jobs', 'durations'
+    and 'has to be completed before' columns
+    """
+    # e.g. file_name = './data/jobslist'
+    job = []
+    duration = []
+    completed_before = []
+
+    # open the file
+    with open(file_name, 'r') as file:
+
+        AAA = csv.reader(file)
+        # iterate through each row
+        for i, row in enumerate(AAA):
+            # add the job number
+            job.append(int(row[0]))
+            # add the duration
+            duration.append(int(row[1]))
+            # if there are jobs to be completed before, add them
+            if len(row) > 2:
+                completed_before.append([int(node) for node in row[2:]])
+
+            else:
+                # else add an empty list.
+                completed_before.append([])
+
+    file.close()
+
+    # combine these together
+
+    data_frame = np.column_stack((np.array(job,dtype=int), np.array(duration,dtype=int), completed_before))
+
+    return data_frame
+
+
+
 def generate_weight_matrix(data):
     """
     This function uses the data to create an adjacency matrix, based
@@ -11,72 +54,47 @@ def generate_weight_matrix(data):
     and 'has to be completed before' columns
     :return: the adjacency matrix for this graph
     """
-    global total_nodes,virtual_start,virtual_finish
-    # we start with an array of -1s and populate the entries that correspond to
-    # connected nodes.
+    global total_nodes, virtual_start, virtual_finish
+    # we start with an array of -1s and populate the entries that
+    # correspond to connected nodes.
     total_nodes = data.shape[0]
-    weight_matrix = -1 * np.ones((2 * total_nodes + 2, 2 * total_nodes + 2), dtype=int)
+    weight_matrix = -1 * np.ones((2 * total_nodes + 2, 2 * total_nodes + 2)
+                                 , dtype=int)
 
     # node start is the index of start jobs
-    node_start = data[:,0].astype(int)
+    node_start = data[:, 0].astype(int)
     # job_duration are the job durations for each job
-    job_duration = data[:,1].astype(int)
+    job_duration = data[:, 1].astype(int)
 
     # joining each node start to node finish, with the weight as that job's
     # duration.
-    weight_matrix[node_start, node_start+13] = job_duration
+    weight_matrix[node_start, node_start + 13] = job_duration
 
-    # note on efficiency: I could perhaps do the following for loop by flattening
-    # the data[:,2] column, but I need to create a list of node_start coresponding
-    # to the number of jobs that each job depends on. This is O(N) anyway, so doing
+    # note on efficiency: I could perhaps do the following for
+    # loop by flattening the data[:,2] column, but I need to
+    # create a list of node_start corresponding to the number of
+    # jobs that each job depends on. This is O(N) anyway, so doing
     # this via a for loop isn't slower.
+
+    # note: also, python doesn't like slicing like a[0,[[4,5],[1,2,3]]]
 
     for row in data:
         jobs2 = row[2]
         node_start2 = row[0]
         for job in jobs2:
             # this is the connections of dependent jobs
-            weight_matrix[node_start2+13, job] = 0
+            weight_matrix[node_start2 + 13, job] = 0
 
-
+    # these are the indices for virtual start and finish
     virtual_start = int(weight_matrix.shape[0]) - 2
     virtual_finish = int(weight_matrix.shape[0]) - 1
 
-
+    # allow movement between virtual start and all the nodes
     weight_matrix[virtual_start, 0:total_nodes] = 0
+    # allow movement from all the nodes to virtual finish
     weight_matrix[total_nodes:virtual_start, virtual_finish] = 0
 
     return weight_matrix
-
-
-def extract_data(file_name):
-    global completed_before, duration
-    # e.g. file_name = './data/jobslist'
-    job = []
-    duration = []
-    completed_before = []
-
-    with open(file_name, 'r') as file:
-
-        AAA = csv.reader(file)
-
-        for i, row in enumerate(AAA):
-
-            job.append(int(row[0]))
-
-            duration.append(int(row[1]))
-
-            if len(row) > 2:
-                completed_before.append([int(node) for node in row[2:]])
-
-            else:
-                completed_before.append([])
-
-    file.close()
-
-    data_frame = np.column_stack((job, duration, completed_before))
-
-    return data_frame
 
 
 def updated_bellman_ford(ist, isp, wei):
@@ -110,7 +128,7 @@ def updated_bellman_ford(ist, isp, wei):
     for u in range(0, V):
         for v in range(0, V):
             w = wei[u, v]
-            if (w != 0):
+            if (w != 1):
                 if (d[u] + w < d[v]):
                     # print('graph contains a negative-weight cycle')
                     pass
@@ -185,7 +203,6 @@ def find_threads(start_stop_adjusted_input):
 
             possible_jobs = start_stop_vector[condition1[0] & condition2[0], 2]
 
-
             if len(possible_jobs) != 0:
 
                 # find the job which minimises abs(current - earliest_start of job)
@@ -204,8 +221,6 @@ def find_threads(start_stop_adjusted_input):
                             current_max = time_difference
                             current_length = start_stop_vector[job, 1] - start_stop_vector[job, 0]
                             minimising_job = job
-
-
 
                 # we now have the job that is closest to current, and also with the longest job time.
 
@@ -235,10 +250,8 @@ def find_threads(start_stop_adjusted_input):
 if __name__ == '__main__':
 
     data = extract_data('./data/jobslist')
-    print(data)
 
     weights = generate_weight_matrix(data)
-
 
 
     adjusted_weights = -1 * weights
