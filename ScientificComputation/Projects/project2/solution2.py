@@ -2,37 +2,54 @@ import csv
 import numpy as np
 import sys
 
-
-def node_finish(node):
-    return node + 13
-
-
 def generate_weight_matrix(data):
+    """
+    This function uses the data to create an adjacency matrix, based
+    on the rules outlined.
+
+    :param data: three column np.array with 'jobs', 'durations'
+    and 'has to be completed before' columns
+    :return: the adjacency matrix for this graph
+    """
+    global total_nodes,virtual_start,virtual_finish
+    # we start with an array of -1s and populate the entries that correspond to
+    # connected nodes.
     total_nodes = data.shape[0]
     weight_matrix = -1 * np.ones((2 * total_nodes + 2, 2 * total_nodes + 2), dtype=int)
 
+    # node start is the index of start jobs
+    node_start = data[:,0].astype(int)
+    # job_duration are the job durations for each job
+    job_duration = data[:,1].astype(int)
+
+    # joining each node start to node finish, with the weight as that job's
+    # duration.
+    weight_matrix[node_start, node_start+13] = job_duration
+
+    # note on efficiency: I could perhaps do the following for loop by flattening
+    # the data[:,2] column, but I need to create a list of node_start coresponding
+    # to the number of jobs that each job depends on. This is O(N) anyway, so doing
+    # this via a for loop isn't slower.
+
     for row in data:
+        jobs2 = row[2]
+        node_start2 = row[0]
+        for job in jobs2:
+            # this is the connections of dependent jobs
+            weight_matrix[node_start2+13, job] = 0
 
-        node_start = row[0]
-        weight = row[1]
-        jobs = row[2]
-
-        weight_matrix[node_start, node_finish(node_start)] = weight
-
-        for job in jobs:
-            weight_matrix[node_finish(node_start), job] = 0
 
     virtual_start = int(weight_matrix.shape[0]) - 2
     virtual_finish = int(weight_matrix.shape[0]) - 1
-    no_nodes = (int(weight_matrix.shape[0]) - 2) / 2
 
-    weight_matrix[virtual_start, 0:no_nodes] = 0
-    weight_matrix[no_nodes:virtual_start, virtual_finish] = 0
+
+    weight_matrix[virtual_start, 0:total_nodes] = 0
+    weight_matrix[total_nodes:virtual_start, virtual_finish] = 0
 
     return weight_matrix
 
 
-def generate_connectivity(file_name):
+def extract_data(file_name):
     global completed_before, duration
     # e.g. file_name = './data/jobslist'
     job = []
@@ -217,9 +234,12 @@ def find_threads(start_stop_adjusted_input):
 
 if __name__ == '__main__':
 
-    data = generate_connectivity('./data/jobslist')
+    data = extract_data('./data/jobslist')
+    print(data)
 
     weights = generate_weight_matrix(data)
+
+
 
     adjusted_weights = -1 * weights
 
