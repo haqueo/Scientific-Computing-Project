@@ -253,10 +253,12 @@ if __name__ == '__main__':
 
     weights = generate_weight_matrix(data)
 
-
     adjusted_weights = -1 * weights
 
-    longest_path = updated_bellman_ford(26, 27, adjusted_weights)[1:-1:2]
+    longest_path = updated_bellman_ford(
+        virtual_start, virtual_finish, adjusted_weights)[1:-1:2]
+
+    print(longest_path)
 
     #######################################################################
 
@@ -273,4 +275,4 @@ if __name__ == '__main__':
     start_stop2 = np.column_stack((start_stop, range(13)))
     start_stop2[[0, 1, 4], 0] = 10000  # this effectively means deletion
     start_stop2[[0, 1, 4], 1] = 20000  # this effectively means deletion
-    print(find_threads(start_stop2))
+    # print(find_threads(start_stop2))

@@ -6,10 +6,10 @@
 \usepackage[english]{babel} % English language/hyphenation
 \usepackage{amsmath,amsfonts,amsthm} % math packages
 \usepackage{subeqnarray}
-
+\usepackage{manfnt}
 \usepackage{lipsum} % used for inserting dummy 'Lorem ipsum' text into the template
 \usepackage{bold-extra}
-
+\usepackage{bclogo}
 \usepackage{listings}
 \usepackage[utf8]{inputenc}
 
@@ -174,7 +174,13 @@ def extract_data(file_name):
     return data_frame
     \end{python}
 
-\begin{figure}[h]
+
+Running this code then produces the array shown in figure \ref{data}
+\begin{python}
+data = extract_data('./data/jobslist')
+\end{python}
+
+\begin{figure}[t]\label{data}
 \caption{np.array produced from extract\_data}
 \centering
 \includegraphics{data}
@@ -251,9 +257,13 @@ def generate_weight_matrix(data):
 
 Running this with the data gives us our adjacency matrix, $W$.
 
+\begin{python}
+weights = generate_weight_matrix(data)
+\end{python}
+
 \subsection{Finding the longest path}
 
-We wish to determine the longest path from virtual start to virtual finish. Clearly, the longest path in $W$ is the shortest path in $A:=-W$, where $A = \{a_{i,j} \}$. If we look at the definition of W in section 1.2, we see that node $i$ is connected to node $j$ $\iff$ $w_{i,j} \geq 0 \iff a_{i,j} \leq 0$, since $w_{i,j} = -a_{i,j}$. Similarly, node $i$ is not connected to node $j \iff w_{i,j} = -1 \iff a_{i,j} = 1$. \\
+We wish to determine the longest path from virtual start to virtual finish. Clearly, the longest path in $W$ is the shortest path in the graph defined by $A:=-W$, where $A = \{a_{i,j} \}$. If we look at the definition of W in section 1.2, we see that node $i$ is connected to node $j$ $\iff$ $w_{i,j} \geq 0 \iff a_{i,j} \leq 0$, since $w_{i,j} = -a_{i,j}$. Similarly, node $i$ is not connected to node $j \iff w_{i,j} = -1 \iff a_{i,j} = 1$. \\
 Therefore to find the shortest path in A from $v_{s}$ to $v_{f}$ we can apply the Bellman Ford algorithm (since we have negative weights), with the modification that instead of a weight of 0 implying two nodes are not connected, we use 1 instead. I outline these changes below:
 
 \begin{figure}[h]
@@ -262,7 +272,22 @@ Therefore to find the shortest path in A from $v_{s}$ to $v_{f}$ we can apply th
 \includegraphics{changes}
 \end{figure}
 
-Otherwise, the code is the same as from tutorials, so I will not include it in full here.
+Otherwise, the code is the same as from tutorials, so I will not include it in full here.\\ \\
+The following code calculates the longest path from $v_{s}$ to $v_{f}$.
+
+\begin{python}
+    adjusted_weights = -1 * weights
+    longest_path = updated_bellman_ford(
+        virtual_start, virtual_finish, adjusted_weights)[1:-1:2]
+\end{python}
+printing this longest path gives:
+\begin{figure}[h]
+\caption{longest path from virtual start to virtual finish}
+\centering
+\includegraphics[scale=0.9]{long}
+\end{figure}
+
+\bcattention \quad since our adjacency matrix uses the ordering $0_{s} 1_{s} \dots 12_{s} 0_{f} 1_{f} \dots 12_{f} v_{s} v_{f}$, our output will follow the same style. i.e $[v_{s},node1_{s},node1_{f},node2_{s},node2_{f},\dots,nodek_{s},nodek_{f},v_{f}]$. But the virtual nodes are just dummy nodes. We're really trying to find the longest dependent job sequence, and they ensure that we have. So we need to bring our results back to the normal scale, by removing the first and last values, then taking every second value. The python slice [1:-1:2] does exactly this.
 
 \subsection{Finding the earliest start and stop times}
 \subsection{Producing the Gantt chart}
