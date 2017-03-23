@@ -421,7 +421,6 @@ See Figure 5.1 for the start\_stop array.
 Now we have our earliest start and stop times for each job, we can find one solution using a worker for each job, this finishes in the fastest time of 130 minutes. We are bound to 130 minutes because this is the earliest finishing time for job 4. See Figure \ref{first}.\\
 We have optimised for time, but clearly not for workers. \\
 
-
 \begin{figure}[h]
 \caption{Gantt chart using start and stop times}
 \centering
@@ -433,23 +432,23 @@ At the end of section 1.4 we showed how the \textit{iterative\_bell} function fo
 \begin{figure}[h]
 \caption{The longest job sequences in the graph}
 \centering
-\includegraphics[scale=0.5]{final2}\label{second}
+\includegraphics[scale=0.9]{longest}\label{second}
 \end{figure}
 
-Now, we can slide jobs up and down in the Gantt diagram as we please, without disturbing times or job dependencies. We should do so in accordance with the longest job sequences, in figure \ref{second} as we will inevitably waste less time between jobs. This sliding up and down results in the Gantt diagram in figure \ref{third}
+Now, we can slide jobs up and down in the Gantt diagram as we please, without disturbing times or job dependencies. We should do so in accordance with the longest job sequences in figure \ref{second} as we will inevitably waste less time between jobs. This sliding up and down results in the Gantt diagram in figure \ref{third}
 
 \begin{figure}[h]
 \caption{updated Gantt diagram}
 \centering
-\includegraphics[scale=0.6]{group}\label{third}
+\includegraphics[scale=0.5]{final2}\label{third}
 \end{figure}
-
-Some jobs are able to move freely as no jobs depend on them, and they depend on no others. Like job 8 for example. So we can move job 8 to the end of the $6 \to 5 \to 7$ row as its duration will still be less than 130. We then spot that we can move 12 to the end of the $9 \to 11$ row, and slot 10 between $2 \to 3$ while still respecting all job dependencies. This is shown in figure \ref{fourth}.
+It is clear that we have preserved $0 \to 1 \to 4$, \ $2 \to 3$ and $6 \to 5 \to 7$. The sequence $9 \to 11$ follows $6$ just as in its longest path in lane (worker) 4, while I shift the remaining three jobs to the 5th row. \\
+Some jobs are able to move freely as no jobs depend on them, and they depend on no others. Like job 8 for example. So we can move job 8 to the end of the $6 \to 5 \to 7$ row as its duration will still be less than 130. We then spot that we can move 12 upwards one row into lane 4 and, most suprisingly, slot 10 between $2 \to 3$ while still respecting all job dependencies. This is shown in figure \ref{fourth}.
 
 \begin{figure}[h]
 \caption{Final Gantt diagram}
 \centering
-\includegraphics[scale=0.6]{final}\label{fourth}
+\includegraphics[scale=0.5]{final3}\label{fourth}
 \end{figure}
 
 It is impossible to fit these jobs on three lines even if we ignore job dependencies, so we have optimised the workflow as required.

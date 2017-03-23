@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.15 (TeX Live 2014) (preloaded format=pdflatex 2016.2.2)  23 MAR 2017 14:20
+This is pdfTeX, Version 3.14159265-2.6-1.40.15 (TeX Live 2014) (preloaded format=pdflatex 2016.2.2)  23 MAR 2017 14:47
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -1638,59 +1638,63 @@ Underfull \hbox (badness 10000) in paragraph at lines 421--423
 File: images/final1.png Graphic file (type png)
 
 <use images/final1.png>
-Package pdftex.def Info: images/final1.png used on input line 428.
+Package pdftex.def Info: images/final1.png used on input line 427.
 (pdftex.def)             Requested size: 481.95204pt x 215.85709pt.
 
-Overfull \hbox (33.82109pt too wide) in paragraph at lines 428--429
+Overfull \hbox (33.82109pt too wide) in paragraph at lines 427--428
  [][][] 
  []
 
-<images/final2.png, id=76, 935.495pt x 225.84375pt>
+<images/longest.png, id=76, 78.2925pt x 109.40875pt>
+File: images/longest.png Graphic file (type png)
+ <use images/longest.png>
+Package pdftex.def Info: images/longest.png used on input line 435.
+(pdftex.def)             Requested size: 70.46259pt x 98.46693pt.
+
+<images/final2.png, id=77, 935.495pt x 225.84375pt>
 File: images/final2.png Graphic file (type png)
  <use images/final2.png>
-Package pdftex.def Info: images/final2.png used on input line 436.
+Package pdftex.def Info: images/final2.png used on input line 443.
 (pdftex.def)             Requested size: 467.74635pt x 112.92159pt.
 
-Overfull \hbox (19.6154pt too wide) in paragraph at lines 436--437
+Overfull \hbox (19.6154pt too wide) in paragraph at lines 443--444
  [][][] 
  []
-
-<images/group.png, id=77, 669.50125pt x 181.67876pt>
-File: images/group.png Graphic file (type png)
- <use images/group.png>
-Package pdftex.def Info: images/group.png used on input line 444.
-(pdftex.def)             Requested size: 401.70384pt x 109.00809pt.
 
 
 LaTeX Warning: `h' float specifier changed to `ht'.
 
-[10 <./images/final1.png> <./images/final2.png>]
-<images/final.png, id=83, 661.47125pt x 159.59625pt>
-File: images/final.png Graphic file (type png)
- <use images/final.png>
-Package pdftex.def Info: images/final.png used on input line 452.
-(pdftex.def)             Requested size: 396.8858pt x 95.75847pt.
+[10 <./images/final1.png> <./images/longest.png>]
+<images/final3.png, id=83, 1028.84375pt x 219.82124pt>
+File: images/final3.png Graphic file (type png)
+ <use images/final3.png>
+Package pdftex.def Info: images/final3.png used on input line 451.
+(pdftex.def)             Requested size: 514.42062pt x 109.91034pt.
 
-[11 <./images/group.png> <./images/final.png>] (./textemplate.aux) ) 
+Overfull \hbox (66.28967pt too wide) in paragraph at lines 451--452
+ [][][] 
+ []
+
+[11 <./images/final2.png> <./images/final3.png>] (./textemplate.aux) ) 
 Here is how much of TeX's memory you used:
  20836 strings out of 493117
- 369709 string characters out of 6135434
+ 369724 string characters out of 6135434
  609578 words of memory out of 5000000
  23785 multiletter control sequences out of 15000+600000
  95930 words of font info for 118 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  61i,12n,73p,936b,2017s stack positions out of 5000i,500n,10000p,200000b,80000s
-{/usr/local
-/texlive/2014/texmf-dist/fonts/enc/dvips/base/8r.enc}</usr/local/texlive/2014/t
-exmf-dist/fonts/type1/public/fourier/fourier-mex.pfb></usr/local/texlive/2014/t
-exmf-dist/fonts/type1/public/fourier/fourier-ms.pfb></usr/local/texlive/2014/te
-xmf-dist/fonts/type1/public/amsfonts/symbols/msam10.pfb></usr/local/texlive/201
-4/texmf-dist/fonts/type1/adobe/utopia/putb8a.pfb></usr/local/texlive/2014/texmf
--dist/fonts/type1/adobe/utopia/putr8a.pfb></usr/local/texlive/2014/texmf-dist/f
-onts/type1/adobe/utopia/putri8a.pfb></usr/local/texlive/2014/texmf-dist/fonts/t
-ype1/public/txfonts/t1xbtt.pfb></usr/local/texlive/2014/texmf-dist/fonts/type1/
-public/txfonts/t1xtt.pfb>
-Output written on textemplate.pdf (11 pages, 299214 bytes).
+{/usr/loc
+al/texlive/2014/texmf-dist/fonts/enc/dvips/base/8r.enc}</usr/local/texlive/2014
+/texmf-dist/fonts/type1/public/fourier/fourier-mex.pfb></usr/local/texlive/2014
+/texmf-dist/fonts/type1/public/fourier/fourier-ms.pfb></usr/local/texlive/2014/
+texmf-dist/fonts/type1/public/amsfonts/symbols/msam10.pfb></usr/local/texlive/2
+014/texmf-dist/fonts/type1/adobe/utopia/putb8a.pfb></usr/local/texlive/2014/tex
+mf-dist/fonts/type1/adobe/utopia/putr8a.pfb></usr/local/texlive/2014/texmf-dist
+/fonts/type1/adobe/utopia/putri8a.pfb></usr/local/texlive/2014/texmf-dist/fonts
+/type1/public/txfonts/t1xbtt.pfb></usr/local/texlive/2014/texmf-dist/fonts/type
+1/public/txfonts/t1xtt.pfb>
+Output written on textemplate.pdf (11 pages, 299497 bytes).
 PDF statistics:
  117 PDF objects out of 1000 (max. 8388607)
  63 compressed objects within 1 object stream
