@@ -122,10 +122,10 @@ showstringspaces=false            %
 
 \maketitle
 
-\section{Solution Strategy}
+\section{Introduction}
 
 In this coursework, I will use the algorithmic steps provided to design a workflow and job schedule that minimises the duration of the processes while maximising the number of processes that can be executed in parallel. \\
-Rather than describing a strategy in one section and providing the implementation in another, I will be running through each of the steps and describing the functions used in chronological order, finishing on the main code.
+Rather than describing a strategy in one section and providing the implementation in another, I will be running through each of the sections and describing both the code and theory simultaneously. 
 \subsection{Extract data}
 In order to make this program as robust and as general as possible, I have written a csv file which contains the data from Table 1.1 of the question, i.e the List of jobs, their duration and dependencies.
 The function \textit{extract\_data} uses the csv module to iterate through every row of the datafile, and combine them into a numpy array.
@@ -324,8 +324,21 @@ We now have all the information we need to find the earliest start times (the ea
 Here is the python implementation for this section.
 
 \begin{python}
-def iterative_bell(adjusted_weights):
+def iterative_bell(adjusted_weights,start_stop):
+    """
+    This function uses the Bellman Ford algorithm to iteratively find
+    the remaining job sequences in the graph. It adjusts the start_stop 
+    array and returns the longest paths used.
 
+    :param adjusted_weights: A, the negative adjacency matrix
+    :param start_stop: the list of earliest start and stop times to be
+    edited and updated
+    :return: the longest paths used to find the start_stop times
+    """
+    
+    #create the longest paths list
+    longest_paths = []
+    
     # create a copy of the weight matrix
     temp_weights = np.copy(adjusted_weights)
 
@@ -368,7 +381,11 @@ def iterative_bell(adjusted_weights):
         # so the for loop is O(k) in total
 
         removed_nodes[job_sequence] = True  # O(1)
+        longest_paths.append(job_sequence)
+        return longest_paths
 \end{python}
+
+We store the longest paths to help with the creation of the Gantt diagram later.
 
 This is the code to run this function
 
@@ -390,12 +407,41 @@ printing start\_stop gives me this as the output
 
 \subsection{Producing the Gantt chart}
 
-Now we have our earliest start and stop times for each job, we can find one solution using the minimum time of 130 minutes.
+Now we have our earliest start and stop times for each job, we can find one solution using a worker for each job, this finishes in the fastest time of 130 minutes. We are bound to 130 minutes because this is the earliest finishing time for job 4. \\
+We have optimised for time, but clearly not for workers. We do this now. \\
+
 
 \begin{figure}[h]
-\caption{non optimised gantt chart}
+\caption{gantt chart using start and stop times}
 \centering
-\includegraphics{nonop}
+\includegraphics[scale=0.6]{initial}
 \end{figure}
 
+At the end of 1.4 we showed how the \textit{iterative\_bell} function found all of the longest job sequences in our graph. I print these here:
+
+\begin{figure}[h]
+\caption{The longest job sequences in the graph}
+\centering
+\includegraphics[scale=0.6]{longest}
+\end{figure}
+
+Now, we can slide jobs up and down in the Gantt diagram as we please, without disturbing times or job dependencies. We should do so in accordance with the longest job sequences, in figure 1.6 as we will inevitably waste less time between jobs. This sliding up and down results in the following Gantt diagram.
+
+\begin{figure}[h]
+\caption{updated Gantt diagram}
+\centering
+\includegraphics[scale=0.6]{group}
+\end{figure}
+
+Some jobs are able to move freely as no jobs depend on them, and they depend on no others. Like job 8 for example. So we can move job 8 to the end of the $6 \to 5 \to 7$ row as its duration will still be less than 130. We then spot that we can move 12 to the end of the $9 \to 11$ row, and slot 10 between $2 \to 3$ while still respecting all job dependencies.
+
+\begin{figure}[h]
+\caption{Final Gantt diagram}
+\centering
+\includegraphics[scale=0.6]{final}
+\end{figure}
+
+It is impossible to fit these jobs on three lines even if we ignore job dependencies, so we have optimised the workflow as required.
 \end{document}
+
+
