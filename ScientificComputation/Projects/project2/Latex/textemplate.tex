@@ -125,7 +125,7 @@ showstringspaces=false            %
 \section{Introduction}
 
 In this coursework, I will use the algorithmic steps provided to design a workflow and job schedule that minimises the duration of the processes while maximising the number of processes that can be executed in parallel. \\
-Rather than describing a strategy in one section and providing the implementation in another, I will be running through each of the sections and describing both the code and theory simultaneously. 
+Rather than describing a strategy in one section and providing the implementation in another, I will be running through each of the sections and describing the code and theory simultaneously. 
 \section{Extract data}
 In order to make this program as robust and as general as possible, I have written a csv file which contains the data from Table 1.1 of the question, i.e the List of jobs, their duration and dependencies.
 The function \textit{extract\_data} uses the csv module to iterate through every row of the datafile, and combine them into a numpy array.
@@ -182,14 +182,14 @@ Running this code then produces the array shown in figure \ref{data}
 data = extract_data('./data/jobslist')
 \end{python}
 
-\begin{figure}[t]\
+\begin{figure}[t]
 \caption{np.array produced from extract\_data}
 \centering
 \includegraphics{data}\label{data}
 \end{figure}
 
 \section{Constructing the graph}
-We now construct the directed graph, as described in steps \textbf{1,2,3} and \textbf{4} of algorithm 1.1 in the question. For job $m \in \{ 0,1,\dots, 12 \}$ I write $m_{s}$ and $m_{f}$ to mean the start and finish node for job m respectively. I also write $v_{s}$ and $v_{f}$ to mean the virtual start and virtual finish node respectively.
+We now construct the directed graph, as described in steps \textbf{1,2,3} and \textbf{4} of algorithm 1.1 in the question. For job $m \in \{ 0,1,\dots, 12 \}$ I write $m_{s}$ and $m_{f}$ for the start and finish node for job m respectively. I also write $v_{s}$ and $v_{f}$ for the virtual start and virtual finish node respectively.
 
 I will construct an adjacency matrix, $W = \{ w_{i,j} \}$, where $w_{i,j}$ denotes the edge weight between node $i$ and node $j$. The ordering of the matrix rows and columns is the following sequence $$ 0_{s} 1_{s} \dots 12_{s} 0_{f} 1_{f} \dots 12_{f} v_{s} v_{f}$$
 The weights $w_{i,j}$ are specified by steps \textbf{1,2,3} and \textbf{4} of algorithm 1.1, I write the conditions here. $\forall$ jobs m,n $\in \{ 0,1,\dots 12\}$:
@@ -265,7 +265,7 @@ weights = generate_weight_matrix(data)
 
 \section{Finding the longest path}
 
-We wish to determine the longest path from virtual start to virtual finish. Clearly, the longest path in $W$ is the shortest path in the graph defined by $A:=-W$, where $A = \{a_{i,j} \}$. If we look at the definition of W in section 1.2, we see that node $i$ is connected to node $j$ $\iff$ $w_{i,j} \geq 0 \iff a_{i,j} \leq 0$, since $w_{i,j} = -a_{i,j}$. Similarly, node $i$ is not connected to node $j \iff w_{i,j} = -1 \iff a_{i,j} = 1$. \\
+We wish to determine the longest path from virtual start to virtual finish. Clearly, the longest path in $W$ is the shortest path in the graph defined by $A:=-W$, where $A = \{a_{i,j} \}$. If we look at the definition of W in section 3, we see that node $i$ is connected to node $j$ $\iff$ $w_{i,j} \geq 0 \iff a_{i,j} \leq 0$, since $w_{i,j} = -a_{i,j}$. Similarly, node $i$ is not connected to node $j \iff w_{i,j} = -1 \iff a_{i,j} = 1$. \\
 Therefore to find the shortest path in A from $v_{s}$ to $v_{f}$ we can apply the Bellman Ford algorithm (since we have negative weights), with the modification that instead of a weight of 0 implying two nodes are not connected, we use 1 instead. I outline these changes in Figure \ref{changes}:
 
 \begin{figure}[h]
@@ -289,7 +289,7 @@ printing this longest path in Figure \ref{long} gives [0,1,4].
 \includegraphics[scale=0.9]{long}
 \end{figure}
 
-\bcattention \quad since our adjacency matrix uses the ordering $0_{s} 1_{s} \dots 12_{s} 0_{f} 1_{f} \dots 12_{f} v_{s} v_{f}$, our output will follow the same style. i.e $[v_{s},node1_{s},node1_{f},node2_{s},node2_{f},\dots,nodek_{s},nodek_{f},v_{f}]$. But the virtual nodes are just dummy nodes. We're really trying to find the longest dependent job sequence, and they ensure that we have. So we need to bring our results back to the normal scale, by removing the first and last values, then taking every second value. The python slice [1:-1:2] does exactly this. \\ \\
+\bcattention \quad since our adjacency matrix uses the ordering $0_{s} 1_{s} \dots 12_{s} 0_{f} 1_{f} \dots 12_{f} v_{s} v_{f}$, our output will follow the same style. Namely, $[v_{s},node1_{s},node1_{f},node2_{s},node2_{f},\dots,nodek_{s},nodek_{f},v_{f}]$. But the virtual nodes are just dummy nodes. We're really trying to find the longest dependent job sequence, and they ensure that we have. So we need to bring our results back to the normal scale, by removing the first and last values, then taking every second value. The python slice [1:-1:2] does exactly this. \\ \\
 
 So $0 \to 1 \to 4$ is the longest string of jobs.
 
@@ -308,8 +308,10 @@ Let the longest job sequence that finishes on job m be $b_{m_{1}} \to \dots \to 
 \begin{claimproof}
 Suppose not. Then there exists a longer sequence to job i: $b_{k_{1}} \to \dots \to b_{k_{p}} \to b_{m_{i}}$, say. But then, $b_{k_{1}} \to \dots \to b_{k_{p}} \to b_{m_{i}} \to b_{m_{i+1}} \dots \to b_{m_{l-1}} \to b_{m}$ is a longer path to job m than the one we assumed to be. This is a contradiction.
 \end{claimproof}
-
+\\
 This argument about there not existing a longer sequence to job i (or $b_{i}$), is the key to this section. And it is why the introduction of the virtual start and finish nodes is so useful, as it means the longest path from virtual start to virtual finish trails through the graph to give you the longest job sequence. \\ 
+
+Due to these results, after finding the longest job sequence in the graph [0,1,4], we can simply remove the edge from $4_{f} \to v_{f}$. Then if we find the longest job sequence in the graph again, there will be no route from $v_{s}$ to $v_{f}$ via job 4, and we will find the second longest job sequence in the graph. Continuing in this way, removing one node at a time we can find all of the necessary remaining (shorter) job sequences to recover the earliest start and stop times.
 
 In fact, we can remove more connections than just each job in the job sequence to the virtual finish node. After we have found the longest job sequence finishing at job $e$, $b_{c} \to b_{d} \to b_{e}$, say. We can remove the connection between the last pair of jobs in this path, d and e. For if there were another job sequence which could utilise this edge, $b_{c} \to b_{d} \to b_{e}$ would not be the longest job sequence in the graph (currently). This reduction means that there is one less edge for the Bellman Ford algorithm to iterate through, and slightly eases the time complexity.
 
@@ -317,7 +319,7 @@ We now have all the information we need to find the earliest start times (the ea
 
 \begin{enumerate}
 \item Determine the longest path in the graph.
-\item  By the arguments above, you have the start and stop times for every job in that path. For (node in longest path) \{ update the earliest start time for that node if you haven't already \}
+\item  By the arguments above, you have the start and stop times for every job in that path. for (node in longest path) \{ update the earliest start time for that node if you haven't already \}
 \item for (node in longest path) \{ remove connection from node to virtual finish.
 IF len(longest path) > 1: remove the edge between the last pair in the longest path.
 \}
@@ -365,31 +367,32 @@ def iterative_bell(adjusted_weights,start_stop):
 
         # remove the connections from those jobs to virtual finish
         temp_weights[np.array(job_sequence)+13,virtual_finish] = 1
+        # if we have at least 2 elements, remove the last pair
         if len(job_sequence) > 1:
             temp_weights[job_sequence[-2] + 13,job_sequence[-1]] = 1
 
-
-        # determine the times using the formula derived
-        current_time = 0  # O(1)
+        # determine the times using the algorithm derived
+        current_time = 0  
 
         # iterate through the jobs in the job sequence
-        for job in job_sequence:  # O(k)
+        for job in job_sequence:  
 
             # only add to start_times if you haven't already
-            if not removed_nodes[job]:  # O(1)
+            if not removed_nodes[job]:  
                 # set it to the current time. i.e the sum of jobs before it
-                start_stop[job, 0] = current_time  # O(1)
+                start_stop[job, 0] = current_time  
                 start_stop[job, 1] = current_time + job_duration[job]
                 # add 1 to the counter
-                counter += 1  # O(1)
+                counter += 1  
 
             # update current_time
-            current_time += job_duration[job]  # O(1)
+            current_time += job_duration[job]  
 
-
-
-        removed_nodes[job_sequence] = True  # O(1)
+        # set all of the nodes in this job sequence to True
+        removed_nodes[job_sequence] = True  
+        # add this job sequence to the list of longest paths
         longest_paths.append(job_sequence)
+        
     return longest_paths
 \end{python}
 
@@ -400,15 +403,15 @@ This is the code to run this function
 \begin{python}
     start_stop = np.zeros((13, 2), dtype=int)
 
-    iterative_bell(adjusted_weights,start_stop)
+    longest_paths_list = iterative_bell(adjusted_weights,start_stop)
 
     full = np.column_stack((data,start_stop))
-\end{python}
+    \end{python}
 
-printing start\_stop gives me this as the output:
+See Figure 5.1 for the start\_stop array.
 
 \begin{figure}[h]
-\caption{earliest start and stop times for each job}
+\caption{earliest start and stop times for each job - row with index i corresponds to job i}
 \centering
 \includegraphics[scale=0.8]{lists}\label{startst}
 \end{figure}
@@ -416,7 +419,7 @@ printing start\_stop gives me this as the output:
 \section{Producing the Gantt chart}
 
 Now we have our earliest start and stop times for each job, we can find one solution using a worker for each job, this finishes in the fastest time of 130 minutes. We are bound to 130 minutes because this is the earliest finishing time for job 4. See Figure \ref{first}.\\
-We have optimised for time, but clearly not for workers. We do this now. \\
+We have optimised for time, but clearly not for workers. \\
 
 
 \begin{figure}[h]

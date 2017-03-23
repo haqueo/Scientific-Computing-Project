@@ -178,31 +178,32 @@ def iterative_bell(adjusted_weights,start_stop):
 
         # remove the connections from those jobs to virtual finish
         temp_weights[np.array(job_sequence)+13,virtual_finish] = 1
+        # if we have at least 2 elements, remove the last pair
         if len(job_sequence) > 1:
             temp_weights[job_sequence[-2] + 13,job_sequence[-1]] = 1
 
-
-        # determine the times using the formula derived
-        current_time = 0  # O(1)
+        # determine the times using the algorithm derived
+        current_time = 0
 
         # iterate through the jobs in the job sequence
-        for job in job_sequence:  # O(k)
+        for job in job_sequence:
 
             # only add to start_times if you haven't already
-            if not removed_nodes[job]:  # O(1)
+            if not removed_nodes[job]:
                 # set it to the current time. i.e the sum of jobs before it
-                start_stop[job, 0] = current_time  # O(1)
+                start_stop[job, 0] = current_time
                 start_stop[job, 1] = current_time + job_duration[job]
                 # add 1 to the counter
-                counter += 1  # O(1)
+                counter += 1
 
             # update current_time
-            current_time += job_duration[job]  # O(1)
+            current_time += job_duration[job]
 
-
-
-        removed_nodes[job_sequence] = True  # O(1)
+        # set all of the nodes in this job sequence to True
+        removed_nodes[job_sequence] = True
+        # add this job sequence to the list of longest paths
         longest_paths.append(job_sequence)
+
     return longest_paths
 
 
@@ -392,10 +393,12 @@ if __name__ == '__main__':
 
     start_stop = np.zeros((13, 2), dtype=int)
 
-    iterative_bell(adjusted_weights,start_stop)
+    longest_paths_list = iterative_bell(adjusted_weights,start_stop)
 
     full = np.column_stack((data,start_stop))
 
+    print('the longest paths to each node are %s' % str(longest_paths_list))
+    print('the start_stop array is')
     print(start_stop)
 
     ######################################################################

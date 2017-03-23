@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.15 (TeX Live 2014) (preloaded format=pdflatex 2016.2.2)  23 MAR 2017 13:15
+This is pdfTeX, Version 3.14159265-2.6-1.40.15 (TeX Live 2014) (preloaded format=pdflatex 2016.2.2)  23 MAR 2017 13:53
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -1521,20 +1521,23 @@ Underfull \hbox (badness 10000) in paragraph at lines 277--279
 
  []
 
-[5 <./images/changes.png>] <images/long.png, id=56, 64.24pt x 18.0675pt>
+<images/long.png, id=52, 64.24pt x 18.0675pt>
 File: images/long.png Graphic file (type png)
-
-<use images/long.png>
+ <use images/long.png>
 Package pdftex.def Info: images/long.png used on input line 289.
 (pdftex.def)             Requested size: 57.81546pt x 16.26057pt.
+
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
 File: bc-attention.mps Graphic file (type mps)
- [MP to PDF]
+[MP to PDF]
 (/usr/local/texlive/2014/texmf-dist/tex/latex/bclogo/bc-attention.mps)
-Overfull \hbox (3.08286pt too wide) in paragraph at lines 292--293
-\T1/futs/m/n/12 will fol-low the same style. i.e $[\FML/futmi/m/it/12 v[]; node
-\T1/futs/m/n/12 1[]\FML/futmi/m/it/12 ; node\T1/futs/m/n/12 1[]\FML/futmi/m/it/
-12 ; node\T1/futs/m/n/12 2[]\FML/futmi/m/it/12 ; node\T1/futs/m/n/12 2[]\FML/fu
-tmi/m/it/12 ; [] ; nodek[]; nodek[]; v[]\T1/futs/m/n/12 ]$.
+Overfull \hbox (31.96684pt too wide) in paragraph at lines 292--293
+\T1/futs/m/n/12 will fol-low the same style. Namely, $[\FML/futmi/m/it/12 v[]; 
+node\T1/futs/m/n/12 1[]\FML/futmi/m/it/12 ; node\T1/futs/m/n/12 1[]\FML/futmi/m
+/it/12 ; node\T1/futs/m/n/12 2[]\FML/futmi/m/it/12 ; node\T1/futs/m/n/12 2[]\FM
+L/futmi/m/it/12 ; [] ; nodek[]; nodek[]; v[]\T1/futs/m/n/12 ]$.
  []
 
 
@@ -1547,7 +1550,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 292--293
 
  []
 
-
+[5 <./images/changes.png>]
 Underfull \hbox (badness 10000) in paragraph at lines 300--302
 
  []
@@ -1562,13 +1565,13 @@ Underfull \hbox (badness 10000) in paragraph at lines 302--305
 
  []
 
-[6 <./images/long.png>]
-Underfull \hbox (badness 10000) in paragraph at lines 312--313
+
+Underfull \hbox (badness 10000) in paragraph at lines 309--313
 
  []
 
-
-Overfull \hbox (12.7667pt too wide) in paragraph at lines 321--324
+[6 <./images/long.png>]
+Overfull \hbox (12.7667pt too wide) in paragraph at lines 323--326
 []\T1/futs/m/n/12 for (node in longest path) { re-move con-nec-tion from node t
 o vir-tual fin-ish. IF len(longest
  []
@@ -1576,53 +1579,58 @@ o vir-tual fin-ish. IF len(longest
 File: bc-attention.mps Graphic file (type mps)
 [MP to PDF]
 (/usr/local/texlive/2014/texmf-dist/tex/latex/bclogo/bc-attention.mps)
-Underfull \hbox (badness 10000) in paragraph at lines 327--328
+Underfull \hbox (badness 10000) in paragraph at lines 329--330
 
  []
 
 
-Overfull \hbox (7.27368pt too wide) in paragraph at lines 334--335
+Overfull \hbox (7.27368pt too wide) in paragraph at lines 336--337
 [][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][
 ][][][][][][][][][][][][][][][][][][][][][] 
  []
 
 
-Overfull \hbox (20.47382pt too wide) in paragraph at lines 335--336
+Overfull \hbox (20.47382pt too wide) in paragraph at lines 337--338
 [][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][
 ][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][] 
  []
 
 [7]
-Overfull \hbox (13.87375pt too wide) in paragraph at lines 339--340
+Overfull \hbox (13.87375pt too wide) in paragraph at lines 341--342
 [][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][
 ][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][]
  
  []
 
 
-Overfull \hbox (0.67361pt too wide) in paragraph at lines 369--372
+Overfull \hbox (0.67361pt too wide) in paragraph at lines 372--374
 [][][][][][][][][][][][][][][][][][] 
  []
 
 [8]
-Overfull \hbox (46.87408pt too wide) in paragraph at lines 380--381
+Overfull \hbox (46.87408pt too wide) in paragraph at lines 382--383
 [][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][
 ][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][]
 [][][][][][][][][][][][][][][] 
  []
 
 
-Overfull \hbox (7.27368pt too wide) in paragraph at lines 382--383
+Overfull \hbox (7.27368pt too wide) in paragraph at lines 384--385
 [][][][][][][][][][][][][][][][][][][][][] 
+ []
+
+
+Overfull \hbox (0.67361pt too wide) in paragraph at lines 406--408
+[][][][][][][][][][][][][][] 
  []
 
 <images/lists.png, id=70, 88.33pt x 201.75375pt>
 File: images/lists.png Graphic file (type png)
  <use images/lists.png>
-Package pdftex.def Info: images/lists.png used on input line 413.
+Package pdftex.def Info: images/lists.png used on input line 416.
 (pdftex.def)             Requested size: 70.66408pt x 161.40321pt.
 
-Underfull \hbox (badness 10000) in paragraph at lines 418--420
+Underfull \hbox (badness 10000) in paragraph at lines 421--423
 
  []
 
@@ -1631,19 +1639,19 @@ Underfull \hbox (badness 10000) in paragraph at lines 418--420
 File: images/initial.png Graphic file (type png)
 
 <use images/initial.png>
-Package pdftex.def Info: images/initial.png used on input line 425.
+Package pdftex.def Info: images/initial.png used on input line 428.
 (pdftex.def)             Requested size: 400.49934pt x 228.2545pt.
  <images/longest.png, id=76, 78.2925pt x 109.40875pt>
 File: images/longest.png Graphic file (type png)
 
 <use images/longest.png>
-Package pdftex.def Info: images/longest.png used on input line 433.
+Package pdftex.def Info: images/longest.png used on input line 436.
 (pdftex.def)             Requested size: 62.63406pt x 87.5271pt.
  <images/group.png, id=77, 669.50125pt x 181.67876pt>
 File: images/group.png Graphic file (type png)
 
 <use images/group.png>
-Package pdftex.def Info: images/group.png used on input line 441.
+Package pdftex.def Info: images/group.png used on input line 444.
 (pdftex.def)             Requested size: 401.70384pt x 109.00809pt.
 
 
@@ -1653,15 +1661,15 @@ LaTeX Warning: `h' float specifier changed to `ht'.
 <images/final.png, id=83, 661.47125pt x 159.59625pt>
 File: images/final.png Graphic file (type png)
  <use images/final.png>
-Package pdftex.def Info: images/final.png used on input line 449.
+Package pdftex.def Info: images/final.png used on input line 452.
 (pdftex.def)             Requested size: 396.8858pt x 95.75847pt.
 
 [11 <./images/group.png> <./images/final.png>] (./textemplate.aux) ) 
 Here is how much of TeX's memory you used:
- 20834 strings out of 493117
- 369673 string characters out of 6135434
- 610582 words of memory out of 5000000
- 23783 multiletter control sequences out of 15000+600000
+ 20836 strings out of 493117
+ 369719 string characters out of 6135434
+ 609578 words of memory out of 5000000
+ 23785 multiletter control sequences out of 15000+600000
  95930 words of font info for 118 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  61i,12n,73p,936b,2017s stack positions out of 5000i,500n,10000p,200000b,80000s
@@ -1675,7 +1683,7 @@ xmf-dist/fonts/type1/public/amsfonts/symbols/msam10.pfb></usr/local/texlive/201
 onts/type1/adobe/utopia/putri8a.pfb></usr/local/texlive/2014/texmf-dist/fonts/t
 ype1/public/txfonts/t1xbtt.pfb></usr/local/texlive/2014/texmf-dist/fonts/type1/
 public/txfonts/t1xtt.pfb>
-Output written on textemplate.pdf (11 pages, 249857 bytes).
+Output written on textemplate.pdf (11 pages, 250599 bytes).
 PDF statistics:
  117 PDF objects out of 1000 (max. 8388607)
  63 compressed objects within 1 object stream
