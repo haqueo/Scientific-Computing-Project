@@ -185,7 +185,7 @@ data = extract_data('./data/jobslist')
 \begin{figure}[t]\
 \caption{np.array produced from extract\_data}
 \centering
-\includegraphics{data}label{data}
+\includegraphics{data}\label{data}
 \end{figure}
 
 \section{Constructing the graph}
@@ -311,16 +311,20 @@ Suppose not. Then there exists a longer sequence to job i: $b_{k_{1}} \to \dots 
 
 This argument about there not existing a longer sequence to job i (or $b_{i}$), is the key to this section. And it is why the introduction of the virtual start and finish nodes is so useful, as it means the longest path from virtual start to virtual finish trails through the graph to give you the longest job sequence. \\ 
 
+In fact, we can remove more connections than just each job in the job sequence to the virtual finish node. After we have found the longest job sequence finishing at job $e$, $b_{c} \to b_{d} \to b_{e}$, say. We can remove the connection between the last pair of jobs in this path, d and e. For if there were another job sequence which could utilise this edge, $b_{c} \to b_{d} \to b_{e}$ would not be the longest job sequence in the graph (currently). This reduction means that there is one less edge for the Bellman Ford algorithm to iterate through, and slightly eases the time complexity.
+
 We now have all the information we need to find the earliest start times (the earliest stop time is then just the duration of a job + its earliest start time). The algorithm to do this is as follows:
 
 \begin{enumerate}
 \item Determine the longest path in the graph.
 \item  By the arguments above, you have the start and stop times for every job in that path. For (node in longest path) \{ update the earliest start time for that node if you haven't already \}
-\item for (node in longest path) \{ remove connection from node to virtual finish\}
+\item for (node in longest path) \{ remove connection from node to virtual finish.
+IF len(longest path) > 1: remove the edge between the last pair in the longest path.
+\}
 \item If there are still jobs whose start time you haven't determined, GOTO 1. Else, finish.
 \end{enumerate}
 
-\bcattention \quad We can remove more edges than those specified in 2. But there are no marks for efficiency, so I will leave the algorithm as it is to make it cleaner since we have a very small problem size. Also, my claim and proof rely on the fact that the adjacency between jobs does not change at each iteration. (It will still work, but a different argument is needed). \\
+\bcattention \quad It occurred to me that another possible optimisation in this algorithm would be to iterate backwards through the longest job sequence, as you could terminate this loop as soon as you have reached a job whose time you have already settled. But this would not improve the time complexity for a number of reasons: In order to attack the problem this way you need to calculate the sum of the longest job sequence, which is an order of n operation anyway. Sure, np.sum is fast but the job sequence is not a numpy array, and converting each sequence to an array would cost even more time. This approach may be more effective when job sequences and dependencies are very large and complicated, but in this situation the overhead is too much for it to be useful. \\
 
 Here is the python implementation for this section.
 

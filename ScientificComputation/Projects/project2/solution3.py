@@ -154,40 +154,40 @@ def iterative_bell(adjusted_weights,start_stop):
     :return: the longest paths used to find the start_stop times
     """
 
-    # create the longest paths list
+    #create the longest paths list
     longest_paths = []
 
     # create a copy of the weight matrix
     temp_weights = np.copy(adjusted_weights)
 
-    # create a boolean array of False's. removed_nodes[m] = True if
-    # job m has been removed (its value of earliest start and stop
-    # has been calculated).
+    # This is a list of 13 Falses
+    # If a node appears in a job sequence (i.e. we know its start time)
+    # it turns to True.
     removed_nodes = np.zeros(13, dtype=bool)
-
     # a counter so we know when to stop.
     counter = 0
 
-    while counter < 13:  #
-
+    while counter < 13:  # O(1)
         # find the longest path in the graph from virtual start
         # to virtual finish
         job_sequence = updated_bellman_ford(virtual_start,
                                             virtual_finish,
                                             temp_weights)[1:-1:2]
+        # O(13*E) # all we can change is E
+
 
         # remove the connections from those jobs to virtual finish
         temp_weights[np.array(job_sequence)+13,virtual_finish] = 1
-        if len(job_sequence) > 1:
-            temp_weights[job_sequence[-2] + 13,job_sequence[-1]] = 1
-
+        # remove the last pair
+        # if len(job_sequence) > 1:
+        #     temp_weights[job_sequence[-2] + 13,job_sequence[-1]] = 1
 
         # determine the times using the formula derived
-        current_time = 0  # O(1)
+        current_time = sum(job_duration[job_sequence])  # O(1)
 
         # iterate through the jobs in the job sequence
-        for job in job_sequence:  # O(k)
-
+        for job in job_sequence[::-1]:  # O(k)
+            current_time -= job_duration[job]
             # only add to start_times if you haven't already
             if not removed_nodes[job]:  # O(1)
                 # set it to the current time. i.e the sum of jobs before it
@@ -195,12 +195,16 @@ def iterative_bell(adjusted_weights,start_stop):
                 start_stop[job, 1] = current_time + job_duration[job]
                 # add 1 to the counter
                 counter += 1  # O(1)
+                print('counter is %i' % counter)
+                current_time += job_duration[job]
+            else:
+                break
 
             # update current_time
-            current_time += job_duration[job]  # O(1)
+            # O(1)
 
-
-
+        # so the for loop is O(k) in total
+        print(job_sequence)
         removed_nodes[job_sequence] = True  # O(1)
         longest_paths.append(job_sequence)
     return longest_paths
