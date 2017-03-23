@@ -44,7 +44,6 @@ def extract_data(file_name):
     return data_frame
 
 
-
 def generate_weight_matrix(data):
     """
     This function uses the data to create an adjacency matrix, based
@@ -187,6 +186,9 @@ def iterative_bell(adjusted_weights,start_stop):
         # so the for loop is O(k) in total
 
         removed_nodes[job_sequence] = True  # O(1)
+        print(job_sequence)
+
+
 
 
 def find_threads(start_stop_adjusted_input):
@@ -285,4 +287,4 @@ if __name__ == '__main__':
     start_stop2 = np.column_stack((start_stop, range(13)))
     start_stop2[[0, 1, 4], 0] = 10000  # this effectively means deletion
     start_stop2[[0, 1, 4], 1] = 20000  # this effectively means deletion
-    # print(find_threads(start_stop2))
+    print(find_threads(start_stop2))
