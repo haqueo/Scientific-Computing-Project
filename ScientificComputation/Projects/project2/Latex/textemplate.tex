@@ -324,7 +324,7 @@ IF len(longest path) > 1: remove the edge between the last pair in the longest p
 \item If there are still jobs whose start time you haven't determined, GOTO 1. Else, finish.
 \end{enumerate}
 
-\bcattention \quad It occurred to me that another possible optimisation in this algorithm would be to iterate backwards through the longest job sequence, as you could terminate this loop as soon as you have reached a job whose time you have already settled. But this would not improve the time complexity for a number of reasons: In order to attack the problem this way you need to calculate the sum of the longest job sequence, which is an order of n operation anyway. Sure, np.sum is fast but the job sequence is not a numpy array, and converting each sequence to an array would cost even more time. This approach may be more effective when job sequences and dependencies are very large and complicated, but in this situation the overhead is too much for it to be useful. \\
+\bcattention \quad It occurred to me that another possible optimisation in this algorithm would be to iterate backwards through the longest job sequence, as you could terminate this loop as soon as you have reached a job whose time you have already settled. But this would not improve the time complexity in this situation for a number of reasons: In order to attack the problem this way you need to calculate the sum of the longest job sequence, which is an order of n operation anyway. Sure, np.sum is fast but the job sequence is not a numpy array, and converting each sequence to an array would cost even more time. This approach may be more effective when job sequences and dependencies are very large and complicated, but in this situation the overhead is too much for it to be useful. \\
 
 Here is the python implementation for this section.
 
@@ -332,39 +332,42 @@ Here is the python implementation for this section.
 def iterative_bell(adjusted_weights,start_stop):
     """
     This function uses the Bellman Ford algorithm to iteratively find
-    the remaining job sequences in the graph. It adjusts the start_stop 
-    array and returns the longest paths used.
+    the remaining job sequences in the graph. It adjusts the start_stop
+    array
 
     :param adjusted_weights: A, the negative adjacency matrix
     :param start_stop: the list of earliest start and stop times to be
     edited and updated
     :return: the longest paths used to find the start_stop times
     """
-    
-    #create the longest paths list
+
+    # create the longest paths list
     longest_paths = []
-    
+
     # create a copy of the weight matrix
     temp_weights = np.copy(adjusted_weights)
 
-    # This is a list of 13 Falses
-    # If a node appears in a job sequence (i.e. we know its start time)
-    # it turns to True.
+    # create a boolean array of False's. removed_nodes[m] = True if
+    # job m has been removed (its value of earliest start and stop
+    # has been calculated).
     removed_nodes = np.zeros(13, dtype=bool)
+
     # a counter so we know when to stop.
     counter = 0
 
-    while counter < 13:  # O(1)
+    while counter < 13:  #
+
         # find the longest path in the graph from virtual start
         # to virtual finish
         job_sequence = updated_bellman_ford(virtual_start,
                                             virtual_finish,
                                             temp_weights)[1:-1:2]
-        # O(13*E) # all we can change is E
-
 
         # remove the connections from those jobs to virtual finish
         temp_weights[np.array(job_sequence)+13,virtual_finish] = 1
+        if len(job_sequence) > 1:
+            temp_weights[job_sequence[-2] + 13,job_sequence[-1]] = 1
+
 
         # determine the times using the formula derived
         current_time = 0  # O(1)
@@ -383,11 +386,11 @@ def iterative_bell(adjusted_weights,start_stop):
             # update current_time
             current_time += job_duration[job]  # O(1)
 
-        # so the for loop is O(k) in total
+
 
         removed_nodes[job_sequence] = True  # O(1)
         longest_paths.append(job_sequence)
-        return longest_paths
+    return longest_paths
 \end{python}
 
 We store the longest paths to help with the creation of the Gantt diagram later.
