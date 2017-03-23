@@ -126,7 +126,7 @@ showstringspaces=false            %
 
 In this coursework, I will use the algorithmic steps provided to design a workflow and job schedule that minimises the duration of the processes while maximising the number of processes that can be executed in parallel. \\
 Rather than describing a strategy in one section and providing the implementation in another, I will be running through each of the sections and describing both the code and theory simultaneously. 
-\subsection{Extract data}
+\section{Extract data}
 In order to make this program as robust and as general as possible, I have written a csv file which contains the data from Table 1.1 of the question, i.e the List of jobs, their duration and dependencies.
 The function \textit{extract\_data} uses the csv module to iterate through every row of the datafile, and combine them into a numpy array.
 
@@ -182,13 +182,13 @@ Running this code then produces the array shown in figure \ref{data}
 data = extract_data('./data/jobslist')
 \end{python}
 
-\begin{figure}[t]\label{data}
+\begin{figure}[t]\
 \caption{np.array produced from extract\_data}
 \centering
-\includegraphics{data}
+\includegraphics{data}label{data}
 \end{figure}
 
-\subsection{Constructing the graph}
+\section{Constructing the graph}
 We now construct the directed graph, as described in steps \textbf{1,2,3} and \textbf{4} of algorithm 1.1 in the question. For job $m \in \{ 0,1,\dots, 12 \}$ I write $m_{s}$ and $m_{f}$ to mean the start and finish node for job m respectively. I also write $v_{s}$ and $v_{f}$ to mean the virtual start and virtual finish node respectively.
 
 I will construct an adjacency matrix, $W = \{ w_{i,j} \}$, where $w_{i,j}$ denotes the edge weight between node $i$ and node $j$. The ordering of the matrix rows and columns is the following sequence $$ 0_{s} 1_{s} \dots 12_{s} 0_{f} 1_{f} \dots 12_{f} v_{s} v_{f}$$
@@ -263,15 +263,15 @@ Running this with the data gives us our adjacency matrix, $W$.
 weights = generate_weight_matrix(data)
 \end{python}
 
-\subsection{Finding the longest path}
+\section{Finding the longest path}
 
 We wish to determine the longest path from virtual start to virtual finish. Clearly, the longest path in $W$ is the shortest path in the graph defined by $A:=-W$, where $A = \{a_{i,j} \}$. If we look at the definition of W in section 1.2, we see that node $i$ is connected to node $j$ $\iff$ $w_{i,j} \geq 0 \iff a_{i,j} \leq 0$, since $w_{i,j} = -a_{i,j}$. Similarly, node $i$ is not connected to node $j \iff w_{i,j} = -1 \iff a_{i,j} = 1$. \\
-Therefore to find the shortest path in A from $v_{s}$ to $v_{f}$ we can apply the Bellman Ford algorithm (since we have negative weights), with the modification that instead of a weight of 0 implying two nodes are not connected, we use 1 instead. I outline these changes below:
+Therefore to find the shortest path in A from $v_{s}$ to $v_{f}$ we can apply the Bellman Ford algorithm (since we have negative weights), with the modification that instead of a weight of 0 implying two nodes are not connected, we use 1 instead. I outline these changes in Figure \ref{changes}:
 
 \begin{figure}[h]
 \caption{changes to the Bellman Ford algorithm}
 \centering
-\includegraphics{changes}
+\includegraphics{changes}\label{changes}
 \end{figure}
 
 Otherwise, the code is the same as from tutorials, so I will not include it in full here.\\ \\
@@ -282,8 +282,8 @@ The following code calculates the longest path from $v_{s}$ to $v_{f}$.
     longest_path = updated_bellman_ford(
         virtual_start, virtual_finish, adjusted_weights)[1:-1:2]
 \end{python}
-printing this longest path gives:
-\begin{figure}[h]
+printing this longest path in Figure \ref{long} gives [0,1,4].
+\begin{figure}[h]\label{long}
 \caption{longest path from virtual start to virtual finish}
 \centering
 \includegraphics[scale=0.9]{long}
@@ -293,7 +293,7 @@ printing this longest path gives:
 
 So $0 \to 1 \to 4$ is the longest string of jobs.
 
-\subsection{Finding the earliest start and stop times}
+\section{Finding the earliest start and stop times}
 In this section, we adopt the following notation. For a job $m \in \{0,1,\dots,12 \}$, we write $b_{m}$ for the path 
 $$ b_{m} = m_{s} \to m_{f} $$
 
@@ -314,12 +314,13 @@ This argument about there not existing a longer sequence to job i (or $b_{i}$), 
 We now have all the information we need to find the earliest start times (the earliest stop time is then just the duration of a job + its earliest start time). The algorithm to do this is as follows:
 
 \begin{enumerate}
-\item Determine the longest path in the graph. By the arguments above, you have the start and stop times for every job in that path.
-\item Those jobs are done. So remove their connection to virtual end, so we never finish on them again
+\item Determine the longest path in the graph.
+\item  By the arguments above, you have the start and stop times for every job in that path. For (node in longest path) \{ update the earliest start time for that node if you haven't already \}
+\item for (node in longest path) \{ remove connection from node to virtual finish\}
 \item If there are still jobs whose start time you haven't determined, GOTO 1. Else, finish.
 \end{enumerate}
 
-\bcattention \quad We can remove more edges than those specified in 2. But there are no marks for efficiency, so I will leave the algorithm as it is to make it cleaner since we have a very small problem size.
+\bcattention \quad We can remove more edges than those specified in 2. But there are no marks for efficiency, so I will leave the algorithm as it is to make it cleaner since we have a very small problem size. Also, my claim and proof rely on the fact that the adjacency between jobs does not change at each iteration. (It will still work, but a different argument is needed). \\
 
 Here is the python implementation for this section.
 
@@ -397,48 +398,48 @@ This is the code to run this function
     full = np.column_stack((data,start_stop))
 \end{python}
 
-printing start\_stop gives me this as the output
+printing start\_stop gives me this as the output:
 
 \begin{figure}[h]
 \caption{earliest start and stop times for each job}
 \centering
-\includegraphics[scale=0.8]{lists}
+\includegraphics[scale=0.8]{lists}\label{startst}
 \end{figure}
 
-\subsection{Producing the Gantt chart}
+\section{Producing the Gantt chart}
 
-Now we have our earliest start and stop times for each job, we can find one solution using a worker for each job, this finishes in the fastest time of 130 minutes. We are bound to 130 minutes because this is the earliest finishing time for job 4. \\
+Now we have our earliest start and stop times for each job, we can find one solution using a worker for each job, this finishes in the fastest time of 130 minutes. We are bound to 130 minutes because this is the earliest finishing time for job 4. See Figure \ref{first}.\\
 We have optimised for time, but clearly not for workers. We do this now. \\
 
 
 \begin{figure}[h]
 \caption{gantt chart using start and stop times}
 \centering
-\includegraphics[scale=0.6]{initial}
+\includegraphics[scale=0.6]{initial}\label{first}
 \end{figure}
 
-At the end of 1.4 we showed how the \textit{iterative\_bell} function found all of the longest job sequences in our graph. I print these here:
+At the end of section 1.4 we showed how the \textit{iterative\_bell} function found all of the longest job sequences in our graph. I print these in Figure \ref{second}
 
 \begin{figure}[h]
 \caption{The longest job sequences in the graph}
 \centering
-\includegraphics[scale=0.6]{longest}
+\includegraphics[scale=0.8]{longest}\label{second}
 \end{figure}
 
-Now, we can slide jobs up and down in the Gantt diagram as we please, without disturbing times or job dependencies. We should do so in accordance with the longest job sequences, in figure 1.6 as we will inevitably waste less time between jobs. This sliding up and down results in the following Gantt diagram.
+Now, we can slide jobs up and down in the Gantt diagram as we please, without disturbing times or job dependencies. We should do so in accordance with the longest job sequences, in figure \ref{second} as we will inevitably waste less time between jobs. This sliding up and down results in the Gantt diagram in figure \ref{third}
 
 \begin{figure}[h]
 \caption{updated Gantt diagram}
 \centering
-\includegraphics[scale=0.6]{group}
+\includegraphics[scale=0.6]{group}\label{third}
 \end{figure}
 
-Some jobs are able to move freely as no jobs depend on them, and they depend on no others. Like job 8 for example. So we can move job 8 to the end of the $6 \to 5 \to 7$ row as its duration will still be less than 130. We then spot that we can move 12 to the end of the $9 \to 11$ row, and slot 10 between $2 \to 3$ while still respecting all job dependencies.
+Some jobs are able to move freely as no jobs depend on them, and they depend on no others. Like job 8 for example. So we can move job 8 to the end of the $6 \to 5 \to 7$ row as its duration will still be less than 130. We then spot that we can move 12 to the end of the $9 \to 11$ row, and slot 10 between $2 \to 3$ while still respecting all job dependencies. This is shown in figure \ref{fourth}.
 
 \begin{figure}[h]
 \caption{Final Gantt diagram}
 \centering
-\includegraphics[scale=0.6]{final}
+\includegraphics[scale=0.6]{final}\label{fourth}
 \end{figure}
 
 It is impossible to fit these jobs on three lines even if we ignore job dependencies, so we have optimised the workflow as required.
