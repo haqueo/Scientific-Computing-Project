@@ -54,7 +54,7 @@ def generate_weight_matrix(data):
     and 'has to be completed before' columns
     :return: the adjacency matrix for this graph
     """
-    global total_nodes, virtual_start, virtual_finish
+    global total_nodes, virtual_start, virtual_finish,job_duration
     # we start with an array of -1s and populate the entries that
     # correspond to connected nodes.
     total_nodes = data.shape[0]
@@ -143,34 +143,46 @@ def updated_bellman_ford(ist, isp, wei):
     return shpath[::-1]
 
 
-def iterative_bell(adjusted_weights, edge_values):
+def iterative_bell(adjusted_weights,start_stop):
+
     # create a copy of the weight matrix
     temp_weights = np.copy(adjusted_weights)
 
     # This is a list of 13 Falses
     # If a node appears in a job sequence (i.e. we know its start time)
-    # it turns to true.
+    # it turns to True.
     removed_nodes = np.zeros(13, dtype=bool)
+    # a counter so we know when to stop.
     counter = 0
 
     while counter < 13:  # O(1)
+        # find the longest path in the graph from virtual start
+        # to virtual finish
+        job_sequence = updated_bellman_ford(virtual_start,
+                                            virtual_finish,
+                                            temp_weights)[1:-1:2]
+        # O(13*E) # all we can change is E
 
-        job_sequence = updated_bellman_ford(26, 27, temp_weights)[1:-1:2]  # O(13*E) # all we can change is E
 
-        # we write k = len(job_sequence)
+        # remove the connections from those jobs to virtual finish
+        temp_weights[np.array(job_sequence)+13,virtual_finish] = 1
 
-        temp_weights[[node + 13 for node in job_sequence], 27] = 1  # O(k)
-
+        # determine the times using the formula derived
         current_time = 0  # O(1)
 
+        # iterate through the jobs in the job sequence
         for job in job_sequence:  # O(k)
 
+            # only add to start_times if you haven't already
             if not removed_nodes[job]:  # O(1)
-
-                start_times[job] = current_time  # O(1)
+                # set it to the current time. i.e the sum of jobs before it
+                start_stop[job, 0] = current_time  # O(1)
+                start_stop[job, 1] = current_time + job_duration[job]
+                # add 1 to the counter
                 counter += 1  # O(1)
 
-            current_time += edge_values[job]  # O(1)
+            # update current_time
+            current_time += job_duration[job]  # O(1)
 
         # so the for loop is O(k) in total
 
@@ -258,17 +270,15 @@ if __name__ == '__main__':
     longest_path = updated_bellman_ford(
         virtual_start, virtual_finish, adjusted_weights)[1:-1:2]
 
-    print(longest_path)
-
     #######################################################################
 
-    start_times = np.zeros(13, dtype=int)
+    start_stop = np.zeros((13, 2), dtype=int)
 
-    iterative_bell(adjusted_weights, data[:, 1])
+    iterative_bell(adjusted_weights,start_stop)
 
-    stop_times = [data[:, 1][i] + start_times[i] for i in range(13)]
+    full = np.column_stack((data,start_stop))
 
-    start_stop = np.column_stack((start_times, stop_times))
+    print(start_stop)
 
     ######################################################################
 

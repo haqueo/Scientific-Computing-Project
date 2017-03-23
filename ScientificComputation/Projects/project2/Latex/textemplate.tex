@@ -12,7 +12,8 @@
 \usepackage{bclogo}
 \usepackage{listings}
 \usepackage[utf8]{inputenc}
-
+\usepackage{amsthm}
+\usepackage{amssymb}
 % default fixed font does not support bold face
 \DeclareFixedFont{\ttb}{T1}{txtt}{bx}{n}{11} % for bold
 \DeclareFixedFont{\ttm}{T1}{txtt}{m}{n}{11}  % for normal
@@ -35,7 +36,8 @@
 \usetikzlibrary{patterns,fadings}
 
 \graphicspath{ {images/} }
-
+\newenvironment{claim}[1]{\par\noindent\underline{Claim:}\space#1}{}
+\newenvironment{claimproof}[1]{\par\noindent\underline{Proof:}\space#1}{\hfill $\blacksquare$}
 % python style for highlighting
 \newcommand\pythonstyle{\lstset{
 language=Python,
@@ -212,7 +214,7 @@ def generate_weight_matrix(data):
     and 'has to be completed before' columns
     :return: the adjacency matrix for this graph
     """
-    global total_nodes, virtual_start, virtual_finish
+    global total_nodes, virtual_start, virtual_finish,job_duration
     # we start with an array of -1s and populate the entries that
     # correspond to connected nodes.
     total_nodes = data.shape[0]
@@ -287,10 +289,108 @@ printing this longest path gives:
 \includegraphics[scale=0.9]{long}
 \end{figure}
 
-\bcattention \quad since our adjacency matrix uses the ordering $0_{s} 1_{s} \dots 12_{s} 0_{f} 1_{f} \dots 12_{f} v_{s} v_{f}$, our output will follow the same style. i.e $[v_{s},node1_{s},node1_{f},node2_{s},node2_{f},\dots,nodek_{s},nodek_{f},v_{f}]$. But the virtual nodes are just dummy nodes. We're really trying to find the longest dependent job sequence, and they ensure that we have. So we need to bring our results back to the normal scale, by removing the first and last values, then taking every second value. The python slice [1:-1:2] does exactly this.
+\bcattention \quad since our adjacency matrix uses the ordering $0_{s} 1_{s} \dots 12_{s} 0_{f} 1_{f} \dots 12_{f} v_{s} v_{f}$, our output will follow the same style. i.e $[v_{s},node1_{s},node1_{f},node2_{s},node2_{f},\dots,nodek_{s},nodek_{f},v_{f}]$. But the virtual nodes are just dummy nodes. We're really trying to find the longest dependent job sequence, and they ensure that we have. So we need to bring our results back to the normal scale, by removing the first and last values, then taking every second value. The python slice [1:-1:2] does exactly this. \\ \\
+
+So $0 \to 1 \to 4$ is the longest string of jobs.
 
 \subsection{Finding the earliest start and stop times}
+In this section, we adopt the following notation. For a job $m \in \{0,1,\dots,12 \}$, we write $b_{m}$ for the path 
+$$ b_{m} = m_{s} \to m_{f} $$
+
+The first thing to realise is that the earliest start time for job $m \in \{ 0, \dots, 12 \}$ is determined precisely by the length of the longest job sequence to $m$. \\ \\
+This is clear. If job m has no dependencies, it can start right away. \\ 
+But if there are job sequences that finish on job $m$, we need to wait for all of these job sequences to finish, before we can execute job m. More formally, if $$ b_{m_{1}} \to b_{m_{2}} \to \dots \to b_{m_{l}} \to b_{m}$$
+is the longest path in the graph ending on $b_{m}$ , then the earliest time job m can start is $\sum_{i=1}^{l}len(b_{m_{i}}) = \sum_{i=1}^{l} \ \text{duration of job $m_{i}$}$ \\ \\
+\begin{claim}
+Let the longest job sequence that finishes on job m be $b_{m_{1}} \to \dots \to b_{m_{l-1}} \to b_{m}$. Then $\forall i \in \{ 1,\dots,l-1\}$ $$\text{the longest job sequence that finishes on job $m_{i}$ is} \ b_{m_{1}} \to \dots \to b_{m_{i-1}} \to b_{m_{i}}$$
+\end{claim}
+
+\begin{claimproof}
+Suppose not. Then there exists a longer sequence to job i: $b_{k_{1}} \to \dots \to b_{k_{p}} \to b_{m_{i}}$, say. But then, $b_{k_{1}} \to \dots \to b_{k_{p}} \to b_{m_{i}} \to b_{m_{i+1}} \dots \to b_{m_{l-1}} \to b_{m}$ is a longer path to job m than the one we assumed to be. This is a contradiction.
+\end{claimproof}
+
+This argument about there not existing a longer sequence to job i (or $b_{i}$), is the key to this section. And it is why the introduction of the virtual start and finish nodes is so useful, as it means the longest path from virtual start to virtual finish trails through the graph to give you the longest job sequence. \\ 
+
+We now have all the information we need to find the earliest start times (the earliest stop time is then just the duration of a job + its earliest start time). The algorithm to do this is as follows:
+
+\begin{enumerate}
+\item Determine the longest path in the graph. By the arguments above, you have the start and stop times for every job in that path.
+\item Those jobs are done. So remove their connection to virtual end, so we never finish on them again
+\item If there are still jobs whose start time you haven't determined, GOTO 1. Else, finish.
+\end{enumerate}
+
+\bcattention \quad We can remove more edges than those specified in 2. But there are no marks for efficiency, so I will leave the algorithm as it is to make it cleaner since we have a very small problem size.
+
+Here is the python implementation for this section.
+
+\begin{python}
+def iterative_bell(adjusted_weights):
+
+    # create a copy of the weight matrix
+    temp_weights = np.copy(adjusted_weights)
+
+    # This is a list of 13 Falses
+    # If a node appears in a job sequence (i.e. we know its start time)
+    # it turns to True.
+    removed_nodes = np.zeros(13, dtype=bool)
+    # a counter so we know when to stop.
+    counter = 0
+
+    while counter < 13:  # O(1)
+        # find the longest path in the graph from virtual start
+        # to virtual finish
+        job_sequence = updated_bellman_ford(virtual_start,
+                                            virtual_finish,
+                                            temp_weights)[1:-1:2]
+        # O(13*E) # all we can change is E
+
+
+        # remove the connections from those jobs to virtual finish
+        temp_weights[np.array(job_sequence)+13,virtual_finish] = 1
+
+        # determine the times using the formula derived
+        current_time = 0  # O(1)
+
+        # iterate through the jobs in the job sequence
+        for job in job_sequence:  # O(k)
+
+            # only add to start_times if you haven't already
+            if not removed_nodes[job]:  # O(1)
+                # set it to the current time. i.e the sum of jobs before it
+                start_stop[job, 0] = current_time  # O(1)
+                start_stop[job, 1] = current_time + job_duration[job]
+                # add 1 to the counter
+                counter += 1  # O(1)
+
+            # update current_time
+            current_time += job_duration[job]  # O(1)
+
+        # so the for loop is O(k) in total
+
+        removed_nodes[job_sequence] = True  # O(1)
+\end{python}
+
+This is the code to run this function
+
+\begin{python}
+    start_stop = np.zeros((13, 2), dtype=int)
+
+    iterative_bell(adjusted_weights,start_stop)
+
+    full = np.column_stack((data,start_stop))
+\end{python}
+
+printing start\_stop gives me this as the output
+
+\begin{figure}[h]
+\caption{earliest start and stop times for each job}
+\centering
+\includegraphics[scale=0.8]{lists}
+\end{figure}
+
 \subsection{Producing the Gantt chart}
+
+\newpage
 \section{Main Solution Code}
 
 The code in \textit{solution\_final.py} contains the main program which carries out the process outlined by the question, i.e modelling the process of the cars moving across the city of Rome using the rules described. I have added scripts \textit{solution\_epsilon0.py} and \textit{solution\_accident\_occurs} to help answer the related questions at the end of the project.
